@@ -64,8 +64,8 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
         val data = listOf("Order 1 - Created at 20:35", "Order 2 - Created at 20:34", "Order 3 - Created at 20:33")
         MaterialDialog(cxt).show {
             lifecycleOwner(viewLifecycleOwner)
-            title(text = "Table $num - ${fu.getTodayDate()}")
-            listItems(items = data, waitForPositiveButton = false) { dialog, index, text ->
+            title(text = "Table $num - ${avm.getTodayDate()}")
+            listItems(items = data, waitForPositiveButton = false) { dialog, _, text ->
                 Toast.makeText(cxt, "$text", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
             }

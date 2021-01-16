@@ -1,6 +1,9 @@
 package co.wangun.cafepos.util
 
+import android.content.Context
 import android.util.DisplayMetrics
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import co.wangun.cafepos.App.Companion.cxt
 import java.text.SimpleDateFormat
 import java.util.*
@@ -8,13 +11,8 @@ import java.util.*
 
 class FunUtils {
 
-    fun calColumns(size: Int): Int {
-        val displayMetrics: DisplayMetrics = cxt.resources.displayMetrics
-        val dpWidth = displayMetrics.heightPixels / displayMetrics.density
-        return (dpWidth / size).toInt()
-    }
-
-    fun getTodayDate(): String {
-        return SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(Date())
+    fun hideKeyboard(view: View) {
+        val imm = cxt.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }

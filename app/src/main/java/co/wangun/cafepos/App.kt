@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
+import co.wangun.cafepos.db.DbClient.sqlDriver
 import co.wangun.cafepos.util.FunUtils
 import co.wangun.cafepos.util.SessionUtils
 
@@ -18,8 +19,6 @@ class App: Application() {
     private fun initFun() {
         // init val
         cxt = this
-        fu = FunUtils()
-        su = SessionUtils()
 
         // init day/night mode
         setDefaultNightMode(MODE_NIGHT_NO)
@@ -34,8 +33,9 @@ class App: Application() {
 
     companion object {
         lateinit var cxt: Context
-        lateinit var fu: FunUtils
-        lateinit var su: SessionUtils
+        val db: Database by lazy { Database(sqlDriver) }
+        val fu: FunUtils by lazy { FunUtils() }
+        val su: SessionUtils by lazy { SessionUtils() }
     }
 
 }

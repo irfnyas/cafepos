@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_homeFragment_to_orderFragment"
             app:destination="@id/orderFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
     </fragment>
     <fragment
         android:id="@+id/orderFragment"
@@ -22,4 +25,8 @@
             android:name="numTable"
             app:argType="integer" />
     </fragment>
+    <fragment
+        android:id="@+id/menuFragment"
+        android:name="co.wangun.cafepos.view.fragment.MenuFragment"
+        android:label="MenuFragment" />
 </navigation>

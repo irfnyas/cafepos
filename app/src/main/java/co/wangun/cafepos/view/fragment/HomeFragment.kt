@@ -45,62 +45,79 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
     private fun initBtn() {
         binding.apply {
-            btnTablesAmount.setOnClickListener {
-                MaterialDialog(cxt).show {
-                    lifecycleOwner(viewLifecycleOwner)
-                    negativeButton(text = "Back")
-                    positiveButton(text = "Confirm")
-                    title(text = "Tables Amount")
-                    input(
-                        hint = "Input the amount...",
-                        prefill = "${su.get(TablesAmount_INT)}",
-                        inputType = InputType.TYPE_CLASS_NUMBER
-                    ) { _, input ->
-                        su.set(TablesAmount_INT, input.toString().toInt())
-                        initRecycler()
-                    }
-                    getInputField().gravity = Gravity.CENTER
-                    getInputField().setBackgroundColor(
-                        resources.getColor(android.R.color.transparent, null)
-                    )
-                }
+            btnEditTables.setOnClickListener { createTablesDialog() }
+            btnEditMenu.setOnClickListener { navigateToMenuFragment() }
+        }
+    }
+
+    private fun navigateToMenuFragment() {
+        val action = R.id.action_homeFragment_to_menuFragment
+        findNavController().navigate(action)
+    }
+
+    private fun navigateToOrderFragment(num: Int) {
+        val action = HomeFragmentDirections.actionHomeFragmentToOrderFragment(num)
+        findNavController().navigate(action)
+    }
+
+    private fun createTablesDialog() {
+        MaterialDialog(cxt).show {
+            lifecycleOwner(viewLifecycleOwner)
+            cancelable(false)
+            negativeButton(text = "Back")
+            positiveButton(text = "Confirm")
+            title(text = "Tables Amount")
+            input(
+                    hint = "Input the amount...",
+                    prefill = "${su.get(TablesAmount_INT)}",
+                    inputType = InputType.TYPE_CLASS_NUMBER
+            ) { _, input -> putTablesAmount(input.toString().toInt()) }
+            getInputField().apply {
+                gravity = Gravity.CENTER
+                post { selectAll() }
+                setBackgroundColor(resources.getColor(
+                    android.R.color.transparent, null
+                ))
             }
         }
+    }
+
+    private fun putTablesAmount(input: Int) {
+        avm.putTablesAmount(input)
+        initRecycler()
     }
 
     private fun initRecycler() {
-        var tablesAmount = su.get(TablesAmount_INT) as Int
-        if (tablesAmount == 0) tablesAmount = 1
-        val data = IntRange(1, tablesAmount).toList()
-
+        val list = IntRange(1, avm.getTablesAmount()).toList()
         Adapter.builder(viewLifecycleOwner)
-            .addSource(Source.fromList(data))
-            .addPresenter(
-                Presenter.simple(
-                    cxt, R.layout.item_table, 0
-                ) { view, num: Int -> view as MaterialButton
-                    view.apply {
-                        text = "$num"
-                        setOnClickListener { createTableDialog(num) }
-                    }
-                })
-            .into(binding.rvTables)
+                .addSource(Source.fromList(list))
+                .addPresenter(
+                        Presenter.simple(
+                                cxt, R.layout.item_table, 0
+                        ) { view, num: Int ->
+                            view as MaterialButton
+                            view.apply {
+                                text = "$num"
+                                setOnClickListener { createOrderDialog(num) }
+                            }
+                        })
+                .into(binding.rvTables)
     }
 
-    private fun createTableDialog(num: Int) {
+    private fun createOrderDialog(num: Int) {
         val data = listOf("Order 1 - Created at 20:35", "Order 2 - Created at 20:34", "Order 3 - Created at 20:33")
         MaterialDialog(cxt).show {
             lifecycleOwner(viewLifecycleOwner)
-            title(text = "Table $num - ${fu.getTodayDate()}")
-            listItems(items = data, waitForPositiveButton = false) { dialog, index, text ->
-                Toast.makeText(cxt, "$text", Toast.LENGTH_SHORT).show()
-                dialog.dismiss()
-            }
+            cancelable(false)
+            title(text = "Table $num - ${avm.getTodayDate()}")
+            listItems(items = data, waitForPositiveButton = false) {
+                _, _, text -> orderClicked("$text") }
+            positiveButton(text = "New Order") { navigateToOrderFragment(num) }
             negativeButton(text = "Back")
-            positiveButton(text = "New Order") {
-                val action = HomeFragmentDirections.actionHomeFragmentToOrderFragment(num)
-                findNavController().navigate(action)
-            }
         }
+    }
+
+    private fun orderClicked(text: String) {
+        Toast.makeText(cxt, text, Toast.LENGTH_SHORT).show()
     }
 }

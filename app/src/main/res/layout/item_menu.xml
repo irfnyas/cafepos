@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:cardBackgroundColor="@color/grey_300"
+        app:cardCornerRadius="24dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="24dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_name_menu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                android:textColor="@color/grey_900"
+                android:minLines="2"
+                android:maxLines="2"
+                android:ellipsize="end"
+                tools:text="Lamb Lahore Asian Style Cooked"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_desc_menu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/text_name_menu"
+                app:layout_constraintBottom_toTopOf="@id/btn_edit_menu"
+                android:textColor="@color/grey_700"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="24dp"
+                android:ellipsize="end"
+                android:minLines="4"
+                android:maxLines="4"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                tools:text="@tools:sample/lorem/random"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_price_menu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/btn_edit_menu"
+                app:layout_constraintBottom_toBottomOf="@id/btn_edit_menu"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                app:fontFamily="sans-serif"
+                tools:text="£ 8.50"/>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btn_edit_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:src="@drawable/ic_baseline_edit_24"
+                app:tint="@color/grey_50"
+                app:elevation="0dp"
+                app:pressedTranslationZ="0dp"
+                app:backgroundTint="@color/grey_600"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
