@@ -3,6 +3,7 @@ package co.wangun.cafepos.viewmodel
 import androidx.lifecycle.ViewModel
 import co.wangun.cafepos.App.Companion.db
 import cowanguncafepos.Active_order
+import cowanguncafepos.Menu
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -34,5 +35,9 @@ class OrderViewModel: ViewModel() {
 
     fun delOrder(id: Long) {
         db.orderQueries.delete(id)
+    }
+
+    fun getAllMenu(): List<Menu> {
+        return MenuViewModel().getAllMenu()
     }
 }

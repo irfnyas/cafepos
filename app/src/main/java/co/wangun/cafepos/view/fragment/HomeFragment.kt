@@ -112,7 +112,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
     private fun createOrderDialog(num: Int) {
 
-        val list = vm.getTodayOrderForTable(num)
+        val list = vm.getTodayOrderForTable(num).reversed()
 
         MaterialDialog(cxt).show {
             lifecycleOwner(viewLifecycleOwner)

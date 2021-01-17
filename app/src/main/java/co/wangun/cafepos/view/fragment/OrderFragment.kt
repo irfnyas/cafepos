@@ -17,6 +17,7 @@ import co.wangun.cafepos.App.Companion.cxt
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.FragmentOrderBinding
 import co.wangun.cafepos.viewmodel.MainViewModel
+import co.wangun.cafepos.viewmodel.MenuViewModel
 import co.wangun.cafepos.viewmodel.OrderViewModel
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -191,7 +192,7 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
             customView(R.layout.dialog_order, scrollable = true, horizontalPadding = true)
             cornerRadius(24f)
 
-            val allItems = avm.getAllMenu()
+            val allItems = vm.getAllMenu()
             val allOrders = vm.getAllOrders()
             val search = view.findViewById<TextInputEditText>(R.id.fld_item_order)
             val spinner = view.findViewById<PowerSpinnerView>(R.id.spinner_items)

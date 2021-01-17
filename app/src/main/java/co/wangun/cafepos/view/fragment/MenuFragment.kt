@@ -9,11 +9,13 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import co.wangun.cafepos.App.Companion.cxt
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.FragmentMenuBinding
 import co.wangun.cafepos.viewmodel.MainViewModel
+import co.wangun.cafepos.viewmodel.MenuViewModel
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.getInputField
@@ -33,6 +35,7 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
 
     private val TAG: String by lazy { javaClass.simpleName }
     private val avm: MainViewModel by activityViewModels()
+    private val vm: MenuViewModel by viewModels()
     private val bind: FragmentMenuBinding by viewBinding()
 
     override fun onViewCreated(view: View, bundle: Bundle?) {
@@ -60,7 +63,7 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
         val isNew = menu == null
         val titleDialog = if (isNew) "New Menu" else "Edit ${menu?.name}"
         val positiveText = if (isNew) "Add" else "Confirm"
-        val categories = avm.getAllCategories()
+        val categories = vm.getAllCategories()
 
         MaterialDialog(cxt).show {
             lifecycleOwner(viewLifecycleOwner)
@@ -79,20 +82,20 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
 
             if (menu != null) {
                 neutralButton(text = "Remove") {
-                    avm.deleteMenu(menu.id)
+                    vm.deleteMenu(menu.id)
                     dismiss()
                     initRecycler()
                 }
             }
             negativeButton(text = "Back") { dismiss() }
             positiveButton(text = positiveText) {
-                val id = menu?.id ?: avm.countMenu()+1
+                val id = menu?.id ?: vm.countMenu()+1
                 val price = fldPrice.text.toString().toDouble()
                 val newMenu = Menu(id, "${fldName.text}", "${fldDesc.text}",
                     "${spinnerCats.text}", price)
 
-                if (avm.isMenuFormValid(newMenu, isNew)) {
-                    avm.postMenu(newMenu)
+                if (vm.isMenuFormValid(newMenu, isNew)) {
+                    vm.postMenu(newMenu)
                     dismiss()
                     initRecycler()
                 } else {
@@ -100,7 +103,7 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
                         layName.error = "Name must not be empty"
                     }
 
-                    if(isNew && avm.isMenuListed("$fldName")) {
+                    if(isNew && vm.isMenuListed("$fldName")) {
                         layName.error = "$fldName is already on the menu"
                     }
 
@@ -161,7 +164,7 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
 
     private fun initRecycler() {
         Adapter.builder(viewLifecycleOwner)
-            .addSource(Source.fromList(avm.getAllMenu()))
+            .addSource(Source.fromList(vm.getAllMenu()))
             .addPresenter(Presenter.simple(cxt, R.layout.item_menu, 0)
             { view, item: Menu ->
                 view.apply {
