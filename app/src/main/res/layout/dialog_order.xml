@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/lay_item_order"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Search item">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/fld_item_order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="A"
+            android:selectAllOnFocus="true"
+            android:inputType="textImeMultiLine"
+            android:imeOptions="actionNext"
+            android:background="@android:color/transparent"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose item"
+        android:textColor="@color/grey_700"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="16dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+        android:gravity="center"/>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <com.skydoves.powerspinner.PowerSpinnerView
+            android:id="@+id/spinner_items"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            app:spinner_arrow_gravity="end"
+            app:spinner_arrow_tint="@color/black"
+            app:spinner_arrow_padding="8dp"
+            android:background="@color/white"
+            app:spinner_arrow_drawable="@drawable/ic_baseline_arrow_drop_down_24"
+            app:spinner_arrow_show="true"
+            android:textColor="@color/grey_900"
+            android:hint="Choose the item..."
+            android:padding="12dp"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/grey_400"/>
+</androidx.appcompat.widget.LinearLayoutCompat>

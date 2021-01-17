@@ -4,13 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.fragment.HomeFragment">
+    tools:context=".view.fragment.OrderFragment">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/lay_top"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
+        android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            app:iconTint="@color/grey_900"
+            app:icon="@drawable/ic_baseline_arrow_back_24"/>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_title"
@@ -18,23 +27,21 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:paddingHorizontal="24dp"
-            tools:text="New Order"/>
+            tools:text="Order Page"/>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_tables"
+        android:id="@+id/rv_orders"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="16dp"
         android:scrollbars="horizontal"
         android:clipToPadding="false"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="@id/separator_vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lay_top"
-        app:spanCount="5"/>
+        app:layout_constraintTop_toBottomOf="@id/lay_top"/>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="0dp"
@@ -46,16 +53,58 @@
         app:layout_constraintTop_toBottomOf="@id/lay_top"
         app:layout_constraintStart_toStartOf="@id/separator_vertical">
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Edit Menu"
+            android:layout_marginTop="8dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Total"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:fontFamily="sans-serif"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_total_order"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="£ 0.00"
+                android:layout_marginEnd="8dp"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_new_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="New Item"
             android:stateListAnimator="@null"
-            android:layout_marginVertical="4dp"
             app:cornerRadius="24dp"
-            app:icon="@drawable/ic_baseline_restaurant_menu_24"
+            android:layout_marginTop="24dp"
+            app:icon="@drawable/ic_baseline_add_24"
             android:paddingHorizontal="24dp"
             android:paddingVertical="12dp"
+            app:backgroundTint="@color/grey_600"
+            android:textAllCaps="false"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:alpha="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Print Receipt"
+            android:stateListAnimator="@null"
+            app:cornerRadius="24dp"
+            app:icon="@drawable/ic_baseline_print_24"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="12dp"
+            android:layout_marginTop="16dp"
             app:backgroundTint="@color/grey_600"
             android:textAllCaps="false"/>
     </androidx.appcompat.widget.LinearLayoutCompat>

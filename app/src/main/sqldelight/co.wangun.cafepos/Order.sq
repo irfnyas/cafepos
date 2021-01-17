@@ -1,0 +1,31 @@
+CREATE TABLE IF NOT EXISTS active_order (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name TEXT,
+    amount INTEGER,
+    price REAL,
+    note TEXT,
+    num INTEGER,
+    date TEXT,
+    time TEXT
+);
+
+insert:
+INSERT OR REPLACE INTO active_order VALUES ?;
+
+selectAll:
+SELECT * FROM active_order;
+
+selectAllTodayForTable:
+SELECT DISTINCT time FROM active_order WHERE num = ? AND date = ?;
+
+selectAllTimeForTable:
+SELECT * FROM active_order  WHERE num = ? AND date = ? AND time = ?;
+
+delete:
+DELETE FROM active_order WHERE id = ?;
+
+deleteAll:
+DELETE FROM active_order;
+
+count:
+SELECT COUNT (*) FROM active_order;

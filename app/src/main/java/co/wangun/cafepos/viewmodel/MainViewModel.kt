@@ -16,27 +16,6 @@ class MainViewModel: ViewModel() {
 
     private val TAG: String by lazy { javaClass.simpleName }
 
-    fun getTablesAmount(): Int {
-        val amount = su.get(TablesAmount_INT) as Int
-        return if (amount == 0) {
-            su.set(TablesAmount_INT, 1); 1
-        } else amount
-    }
-
-    fun putTablesAmount(input: Int) {
-        su.set(TablesAmount_INT, input.toString().toInt())
-    }
-
-    fun calColumns(size: Int): Int {
-        val displayMetrics: DisplayMetrics = App.cxt.resources.displayMetrics
-        val dpWidth = displayMetrics.heightPixels / displayMetrics.density
-        return (dpWidth / size).toInt()
-    }
-
-    fun getTodayDate(): String {
-        return SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(Date())
-    }
-
     fun withCurrency(num: Double): String {
         return "£ %.2f".format(num)
     }
@@ -49,8 +28,12 @@ class MainViewModel: ViewModel() {
         return db.menuQueries.selectAll().executeAsList().find { it.name == name } != null
     }
 
-    fun getAllMenus(): List<Menu> {
+    fun getAllMenu(): List<Menu> {
         return db.menuQueries.selectAll().executeAsList()
+    }
+
+    fun findMenu(name: String): List<Menu> {
+        return db.menuQueries.find("$name%", "%$name%", "%$name").executeAsList()
     }
 
     fun getAllCategories(): List<String> {

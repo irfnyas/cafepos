@@ -22,8 +22,14 @@
         android:name="co.wangun.cafepos.view.fragment.OrderFragment"
         android:label="OrderFragment" >
         <argument
-            android:name="numTable"
+            android:name="tableOrder"
             app:argType="integer" />
+        <argument
+            android:name="timeOrder"
+            app:argType="string" />
+        <argument
+            android:name="dateOrder"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/menuFragment"

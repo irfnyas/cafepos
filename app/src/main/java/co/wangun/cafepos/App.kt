@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import co.wangun.cafepos.db.DbClient.sqlDriver
 import co.wangun.cafepos.util.FunUtils
 import co.wangun.cafepos.util.SessionUtils
+import com.facebook.stetho.Stetho
 
 class App: Application() {
 
@@ -28,7 +29,8 @@ class App: Application() {
     }
 
     private fun initDebug() {
-        //
+        Stetho.initializeWithDefaults(this)
+        // fu.resetDb()
     }
 
     companion object {
@@ -38,4 +40,5 @@ class App: Application() {
         val su: SessionUtils by lazy { SessionUtils() }
     }
 
+    // TODO:
 }

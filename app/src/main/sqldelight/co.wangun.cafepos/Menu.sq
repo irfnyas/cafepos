@@ -15,6 +15,9 @@ SELECT * FROM menu;
 selectAllCategories:
 SELECT DISTINCT category FROM menu;
 
+find:
+SELECT * FROM menu WHERE name LIKE ? OR name LIKE ? OR name LIKE ?;
+
 delete:
 DELETE FROM menu WHERE id = ?;
 

@@ -1,44 +1,30 @@
 package co.wangun.cafepos.view.fragment
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.res.ColorStateList
 import android.os.Bundle
-import android.text.InputType
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.viewbinding.library.fragment.viewBinding
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
-import co.wangun.cafepos.App
 import co.wangun.cafepos.App.Companion.cxt
-import co.wangun.cafepos.App.Companion.fu
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.FragmentMenuBinding
-import co.wangun.cafepos.databinding.FragmentOrderBinding
-import co.wangun.cafepos.databinding.ItemMenuBinding
-import co.wangun.cafepos.util.SessionUtils
 import co.wangun.cafepos.viewmodel.MainViewModel
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
-import com.afollestad.materialdialogs.list.listItems
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.otaliastudios.elements.Adapter
 import com.otaliastudios.elements.Presenter
 import com.otaliastudios.elements.Source
-import com.otaliastudios.elements.pagers.PageSizePager
 import com.skydoves.powerspinner.PowerSpinnerView
 import cowanguncafepos.Menu
 
@@ -78,11 +64,19 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
 
         MaterialDialog(cxt).show {
             lifecycleOwner(viewLifecycleOwner)
-            cancelable(false)
             title(text = titleDialog)
             noAutoDismiss()
+            cancelable(false)
             customView(R.layout.dialog_menu, scrollable = true, horizontalPadding = true)
             cornerRadius(24f)
+
+            val spinnerCats = view.findViewById<PowerSpinnerView>(R.id.spinner_categories)
+            val btnNewCat = view.findViewById<FloatingActionButton>(R.id.btn_new_category)
+            val fldName = view.findViewById<TextInputEditText>(R.id.fld_name_menu)
+            val fldDesc = view.findViewById<TextInputEditText>(R.id.fld_desc_menu)
+            val fldPrice = view.findViewById<TextInputEditText>(R.id.fld_price_menu)
+            val layName = view.findViewById<TextInputLayout>(R.id.lay_name_menu)
+
             if (menu != null) {
                 neutralButton(text = "Remove") {
                     avm.deleteMenu(menu.id)
@@ -93,42 +87,32 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
             negativeButton(text = "Back") { dismiss() }
             positiveButton(text = positiveText) {
                 val id = menu?.id ?: avm.countMenu()+1
-                val cat = view.findViewById<PowerSpinnerView>(R.id.spinner_categories)
-                val name = view.findViewById<TextInputEditText>(R.id.fld_name_menu)
-                val desc = view.findViewById<TextInputEditText>(R.id.fld_desc_menu)
-                val price = view.findViewById<TextInputEditText>(R.id.fld_price_menu)
-                        .text.toString().toDouble()
-                val layName = findViewById<TextInputLayout>(R.id.lay_name_menu)
-                val newMenu = Menu(id, "${name.text}",
-                        "${desc.text}", "${cat.text}", price
-                )
+                val price = fldPrice.text.toString().toDouble()
+                val newMenu = Menu(id, "${fldName.text}", "${fldDesc.text}",
+                    "${spinnerCats.text}", price)
 
                 if (avm.isMenuFormValid(newMenu, isNew)) {
                     avm.postMenu(newMenu)
                     dismiss()
                     initRecycler()
                 } else {
-                    if(name.text.isNullOrBlank()) {
+                    if(fldName.text.isNullOrBlank()) {
                         layName.error = "Name must not be empty"
                     }
 
-                    if(isNew && avm.isMenuListed("$name")) {
-                        layName.error = "$name is already on the menu"
+                    if(isNew && avm.isMenuListed("$fldName")) {
+                        layName.error = "$fldName is already on the menu"
                     }
 
-                    if(cat.text.isNullOrBlank()) {
-                        cat.setHintTextColor(ContextCompat.getColor(context, R.color.red_900))
+                    if(spinnerCats.text.isNullOrBlank()) {
+                        spinnerCats.setHintTextColor(
+                            ContextCompat.getColor(context, R.color.red_900)
+                        )
                     }
                 }
             }
 
             view.apply {
-                val spinnerCats = findViewById<PowerSpinnerView>(R.id.spinner_categories)
-                val btnNewCat = findViewById<FloatingActionButton>(R.id.btn_new_category)
-                val fldName = findViewById<TextInputEditText>(R.id.fld_name_menu)
-                val fldDesc = findViewById<TextInputEditText>(R.id.fld_desc_menu)
-                val fldPrice = findViewById<TextInputEditText>(R.id.fld_price_menu)
-
                 spinnerCats.apply {
                     lifecycleOwner = viewLifecycleOwner
                     setIsFocusable(false)
@@ -150,6 +134,7 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
 
                     MaterialDialog(cxt).show {
                         lifecycleOwner(viewLifecycleOwner)
+                        cornerRadius(24f)
                         cancelable(false)
                         negativeButton(text = "Back")
                         positiveButton(text = "Confirm")
@@ -176,9 +161,9 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
 
     private fun initRecycler() {
         Adapter.builder(viewLifecycleOwner)
-            .addSource(Source.fromList(avm.getAllMenus()))
+            .addSource(Source.fromList(avm.getAllMenu()))
             .addPresenter(Presenter.simple(cxt, R.layout.item_menu, 0)
-            { view, menu: Menu ->
+            { view, item: Menu ->
                 view.apply {
                     // init view
                     val viewName = findViewById<AppCompatTextView>(R.id.text_name_menu)
@@ -187,10 +172,10 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
                     val viewEdit = findViewById<FloatingActionButton>(R.id.btn_edit_menu)
 
                     // set view
-                    viewName.text = menu.name
-                    viewDesc.text = "(${menu.category}) ${menu.desc}"
-                    viewPrice.text = avm.withCurrency(menu.price ?: 0.0)
-                    viewEdit.setOnClickListener { createMenuDialog(menu) }
+                    viewName.text = item.name
+                    viewDesc.text = "(${item.category}) ${item.desc}"
+                    viewPrice.text = avm.withCurrency(item.price ?: 0.0)
+                    viewEdit.setOnClickListener { createMenuDialog(item) }
                 }
             })
             .into(bind.rvMenus)

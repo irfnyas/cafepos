@@ -8,6 +8,7 @@ import android.viewbinding.library.fragment.viewBinding
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import co.wangun.cafepos.App.Companion.cxt
 import co.wangun.cafepos.App.Companion.fu
@@ -15,6 +16,7 @@ import co.wangun.cafepos.App.Companion.su
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.FragmentHomeBinding
 import co.wangun.cafepos.util.SessionUtils.Companion.TablesAmount_INT
+import co.wangun.cafepos.viewmodel.HomeViewModel
 import co.wangun.cafepos.viewmodel.MainViewModel
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.getInputField
@@ -31,7 +33,8 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
     private val TAG: String by lazy { javaClass.simpleName }
     private val avm: MainViewModel by activityViewModels()
-    private val binding: FragmentHomeBinding by viewBinding()
+    private val vm: HomeViewModel by viewModels()
+    private val bind: FragmentHomeBinding by viewBinding()
 
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
@@ -44,7 +47,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun initBtn() {
-        binding.apply {
+        bind.apply {
             btnEditTables.setOnClickListener { createTablesDialog() }
             btnEditMenu.setOnClickListener { navigateToMenuFragment() }
         }
@@ -55,14 +58,15 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         findNavController().navigate(action)
     }
 
-    private fun navigateToOrderFragment(num: Int) {
-        val action = HomeFragmentDirections.actionHomeFragmentToOrderFragment(num)
+    private fun navigateToOrderFragment(num: Int, date: String, time: String) {
+        val action = HomeFragmentDirections.actionHomeFragmentToOrderFragment(num, time, date)
         findNavController().navigate(action)
     }
 
     private fun createTablesDialog() {
         MaterialDialog(cxt).show {
             lifecycleOwner(viewLifecycleOwner)
+            cornerRadius(24f)
             cancelable(false)
             negativeButton(text = "Back")
             positiveButton(text = "Confirm")
@@ -83,41 +87,46 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun putTablesAmount(input: Int) {
-        avm.putTablesAmount(input)
+        vm.putTablesAmount(input)
         initRecycler()
     }
 
     private fun initRecycler() {
-        val list = IntRange(1, avm.getTablesAmount()).toList()
+
+        val list = IntRange(1, vm.getTablesAmount()).toList()
+
         Adapter.builder(viewLifecycleOwner)
                 .addSource(Source.fromList(list))
                 .addPresenter(
                         Presenter.simple(
                                 cxt, R.layout.item_table, 0
-                        ) { view, num: Int ->
+                        ) { view, item: Int ->
                             view as MaterialButton
                             view.apply {
-                                text = "$num"
-                                setOnClickListener { createOrderDialog(num) }
+                                text = "$item"
+                                setOnClickListener { createOrderDialog(item) }
                             }
                         })
-                .into(binding.rvTables)
+                .into(bind.rvTables)
     }
 
     private fun createOrderDialog(num: Int) {
-        val data = listOf("Order 1 - Created at 20:35", "Order 2 - Created at 20:34", "Order 3 - Created at 20:33")
+
+        val list = vm.getTodayOrderForTable(num)
+
         MaterialDialog(cxt).show {
             lifecycleOwner(viewLifecycleOwner)
+            cornerRadius(24f)
             cancelable(false)
-            title(text = "Table $num - ${avm.getTodayDate()}")
-            listItems(items = data, waitForPositiveButton = false) {
-                _, _, text -> orderClicked("$text") }
-            positiveButton(text = "New Order") { navigateToOrderFragment(num) }
-            negativeButton(text = "Back")
-        }
-    }
+            title(text = "Table $num (${vm.getTodayDate()})")
+            listItems(items = list, waitForPositiveButton = false) { _, _, text ->
+                navigateToOrderFragment(num, vm.getTodayDateDb(), vm.parseTime("$text"))
+            }
 
-    private fun orderClicked(text: String) {
-        Toast.makeText(cxt, text, Toast.LENGTH_SHORT).show()
+            negativeButton(text = "Back")
+            positiveButton(text = "New Order") {
+                navigateToOrderFragment(num, vm.getTodayDateDb(), vm.getTime())
+            }
+        }
     }
 }

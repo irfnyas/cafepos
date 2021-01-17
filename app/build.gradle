@@ -67,6 +67,7 @@ dependencies {
     implementation "com.github.skydoves:powerspinner:1.1.7"
     implementation "com.github.yogacp:android-viewbinding:1.0.2"
     implementation "com.squareup.sqldelight:android-driver:1.4.3"
+    implementation "com.facebook.stetho:stetho:1.5.1"
 
     testImplementation "junit:junit:4.13.1"
     androidTestImplementation "androidx.test.ext:junit:1.1.2"
