@@ -22,7 +22,7 @@
             app:icon="@drawable/ic_baseline_arrow_back_24"/>
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/text_title"
+            android:id="@+id/text_title_order"
             style="@style/TextAppearance.MaterialComponents.Headline6"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -53,32 +53,56 @@
         app:layout_constraintTop_toBottomOf="@id/lay_top"
         app:layout_constraintStart_toStartOf="@id/separator_vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
             android:layout_marginTop="8dp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Customer Number"
+                android:alpha="0.5"
+                android:fontFamily="sans-serif"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_invoice_order"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/grey_900"
+                tools:text="#1202101180845"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="16dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="Total"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                android:alpha="0.5"
                 android:fontFamily="sans-serif"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/text_total_order"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="end"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:textColor="@color/grey_900"
+                android:layout_marginTop="4dp"
                 android:text="£ 0.00"
-                android:layout_marginEnd="8dp"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_new_item"

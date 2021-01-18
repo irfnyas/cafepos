@@ -2,7 +2,6 @@ package co.wangun.cafepos.view.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.viewbinding.library.fragment.viewBinding
 import androidx.appcompat.widget.AppCompatTextView
@@ -49,60 +48,62 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
     }
 
     private fun initRecycler() {
-
         val source = vm.getAllOrders().sortedDescending()
         Adapter.builder(viewLifecycleOwner)
-            .addSource(Source.fromList(source))
-            .addPresenter(
-                Presenter.simple(
-                    cxt, R.layout.item_history, 0
-                ) { view, item: String ->
-                    view.apply {
-                        val itemSplit = item.split("?")
-                        val num = itemSplit[0]
-                        val date = itemSplit[1]
-                        val time = itemSplit[2]
+                .addSource(Source.fromList(source))
+                .addPresenter(Presenter.simple(cxt, R.layout.item_history, 0)
+                { view, item: String -> view.apply {
+                    // init val
+                    val itemSplit = item.split("?")
+                    val num = itemSplit[0]
+                    val date = itemSplit[1]
+                    val time = itemSplit[2]
 
-                        val titleText = findViewById<AppCompatTextView>(R.id.text_title_history)
-                        val captionText = findViewById<AppCompatTextView>(R.id.text_caption_history)
-                        val detailBtn = findViewById<FloatingActionButton>(R.id.btn_detail_history)
+                    // init view
+                    val titleText = findViewById<AppCompatTextView>(R.id.text_title_history)
+                    val captionText = findViewById<AppCompatTextView>(R.id.text_caption_history)
+                    val detailBtn = findViewById<FloatingActionButton>(R.id.btn_detail_history)
 
-                        titleText.text = "Table $num ($time)"
-                        captionText.text = date
-
-                        detailBtn.setOnClickListener { createDetailDialog(item) }
-                    }
-                })
-            .into(bind.rvHistories)
+                    // set view
+                    titleText.text = "Table $num ($time)"
+                    captionText.text = date
+                    detailBtn.setOnClickListener { createDetailDialog(item) }
+                } })
+                .into(bind.rvHistories)
     }
 
     private fun createDetailDialog(tableInput: String) {
         MaterialDialog(cxt).show {
             lifecycleOwner(viewLifecycleOwner)
-            customView(R.layout.dialog_receipt, horizontalPadding = true, scrollable = true, dialogWrapContent = true)
+            customView(
+                    R.layout.dialog_receipt,
+                    horizontalPadding = true,
+                    scrollable = true,
+                    dialogWrapContent = true
+            )
             cornerRadius(24f)
             negativeButton(text = "Back")
             positiveButton(text = "Print")
 
             view.apply {
                 // init view
+                val invoiceText = findViewById<AppCompatTextView>(R.id.text_invoice_receipt)
                 val tableText = findViewById<AppCompatTextView>(R.id.text_table_receipt)
                 val totalText = findViewById<AppCompatTextView>(R.id.text_total_receipt)
                 val rvItems = findViewById<RecyclerView>(R.id.rv_items_receipt)
 
                 // set text
+                invoiceText.text = avm.invoiceInReceipt(tableInput)
                 tableText.text = avm.tableInReceipt(tableInput)
                 totalText.text = avm.totalInReceipt(tableInput)
 
                 // set recycler
                 val source = vm.getDetailOrders(tableInput)
                 Adapter.builder(viewLifecycleOwner)
-                    .addSource(Source.fromList(source))
-                    .addPresenter(Presenter.simple(cxt, R.layout.item_receipt, 0
-                    ) { view, item: String ->
-                        view.findViewById<AppCompatTextView>(R.id.text_item_receipt).text = item
-                    })
-                    .into(rvItems)
+                        .addSource(Source.fromList(source))
+                        .addPresenter(Presenter.simple(cxt, R.layout.item_receipt, 0
+                        ) { view, item: String -> (view as AppCompatTextView).text = item })
+                        .into(rvItems)
             }
         }
     }

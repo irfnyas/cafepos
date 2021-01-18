@@ -20,6 +20,22 @@ class MainViewModel: ViewModel() {
         return "£ %.2f".format(num)
     }
 
+    fun invoiceInReceipt(tableInput: String): String {
+        val itemSplit = tableInput.split("?")
+        val num = "#${itemSplit[0]}"
+        val date = itemSplit[1].replace("-","")
+        val time = itemSplit[2].replace(":","")
+        val static = "Customer Number"
+        val inv = "$num$date$time"
+
+        val totalLen = 40
+        val staticLen = static.length
+        val invLen = inv.length
+        val space = " ".repeat(totalLen - staticLen - invLen)
+
+        return "$static$space$inv"
+    }
+
     fun tableInReceipt(tableInput: String): String {
         val itemSplit = tableInput.split("?")
         val num = itemSplit[0]
@@ -39,6 +55,7 @@ class MainViewModel: ViewModel() {
         val num = itemSplit[0].toLong()
         val date = itemSplit[1]
         val time = itemSplit[2]
+        val static = "Total"
 
         val totalPrice = db.orderQueries
             .selectAllTimeForTable(num, date, time)
@@ -46,10 +63,10 @@ class MainViewModel: ViewModel() {
         val price = withCurrency(totalPrice)
 
         val totalLen = 27
-        val staticLen = 5
+        val staticLen = static.length
         val priceLen = price.length
         val space = " ".repeat(totalLen - staticLen - priceLen)
-        return "Total$space$price"
+        return "$static$space$price"
     }
 
     fun itemInReceipt(nameInput: String, amountInput: Long, priceInput: Double): String {
@@ -68,7 +85,6 @@ class MainViewModel: ViewModel() {
         }
 
         val space = " ".repeat(totalLen - nameLen - amountLen - priceLen)
-        Log.d(TAG, "AAAA: $totalLen, $nameLen, $amountLen, $priceLen")
         return "${amount}${name}${space}${price}"
     }
 }

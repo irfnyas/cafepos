@@ -65,21 +65,27 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
         setTitle()
         setRecycler()
         setPrice()
+        setInvoice()
     }
 
     private fun setTitle() {
         val titleText = "Table ${args.tableOrder} (${args.dateOrder} ${args.timeOrder})"
-        bind.textTitle.text = titleText
+        bind.textTitleOrder.text = titleText
+    }
+
+    private fun setInvoice() {
+        val tableInput = "#${args.tableOrder}" +
+                args.dateOrder.replace("-","") +
+                args.timeOrder.replace(":","")
+        bind.textInvoiceOrder.text = tableInput
     }
 
     private fun setRecycler() {
         val source = vm.getAllOrders()
         Adapter.builder(viewLifecycleOwner)
-            .addSource(Source.fromList(source))
-            .addPresenter(
-                Presenter.simple(
-                    cxt, R.layout.item_order, 0
-                ) { view, item: Active_order ->
+                .addSource(Source.fromList(source))
+                .addPresenter(Presenter.simple(cxt, R.layout.item_order, 0)
+                { view, item: Active_order ->
                     view.apply {
                         // init view
                         val nameText = findViewById<AppCompatTextView>(R.id.text_name_order)
@@ -130,7 +136,7 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
                         }
                     }
                 })
-            .into(bind.rvOrders)
+                .into(bind.rvOrders)
     }
 
     private fun createRemoveDialog(item: Active_order) {
@@ -153,15 +159,15 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
             positiveButton(text = "Confirm")
 
             input(
-                hint = "Input the note or leave it empty...",
-                prefill = "${item.note}", allowEmpty = true
+                    hint = "Input the note or leave it empty...",
+                    prefill = "${item.note}", allowEmpty = true
             ) { _, input -> putItem(item, item.amount ?: 0,"$input", true) }
 
             getInputField().apply {
                 gravity = Gravity.CENTER
                 post { selectAll() }
                 setBackgroundColor(resources.getColor(
-                    android.R.color.transparent, null
+                        android.R.color.transparent, null
                 ))
             }
         }
@@ -169,10 +175,10 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
 
     private fun putItem(item: Active_order, amount: Long, note: String?, refresh: Boolean) {
         vm.postOrder(
-            Active_order(
-                item.id, item.name, amount, item.price,
-                note, item.num, item.date, item.time
-            )
+                Active_order(
+                        item.id, item.name, amount, item.price,
+                        note, item.num, item.date, item.time
+                )
         )
         if(refresh) initView()
     }
@@ -224,8 +230,8 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
 
     private fun prePostOrder(chosen: Menu?) {
         val order = Active_order(vm.countOrder() + 1, chosen?.name, 1,
-            chosen?.price ?: 0.0, "", args.tableOrder.toLong(),
-            args.dateOrder, args.timeOrder )
+                chosen?.price ?: 0.0, "", args.tableOrder.toLong(),
+                args.dateOrder, args.timeOrder )
         vm.postOrder(order)
         initView()
     }
