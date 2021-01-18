@@ -21,8 +21,9 @@ class OrderViewModel: ViewModel() {
     }
 
     fun getAllOrders(): List<Active_order> {
-        return db.orderQueries.selectAllTimeForTable(tableOrder, dateOrder, timeOrder)
-            .executeAsList().toMutableList()
+        return db.orderQueries
+            .selectAllTimeForTable(tableOrder, dateOrder, timeOrder)
+            .executeAsList()
     }
 
     fun countOrder(): Long {

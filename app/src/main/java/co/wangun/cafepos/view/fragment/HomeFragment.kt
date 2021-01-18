@@ -50,7 +50,13 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         bind.apply {
             btnEditTables.setOnClickListener { createTablesDialog() }
             btnEditMenu.setOnClickListener { navigateToMenuFragment() }
+            btnOrderHistory.setOnClickListener { navigateToHistoryFragment() }
         }
+    }
+
+    private fun navigateToHistoryFragment() {
+        val action = R.id.action_homeFragment_to_historyFragment
+        findNavController().navigate(action)
     }
 
     private fun navigateToMenuFragment() {
@@ -112,12 +118,11 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
     private fun createOrderDialog(num: Int) {
 
-        val list = vm.getTodayOrderForTable(num).reversed()
+        val list = vm.getTodayOrderForTable(num).sortedDescending()
 
         MaterialDialog(cxt).show {
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
-            cancelable(false)
             title(text = "Table $num (${vm.getTodayDate()})")
             listItems(items = list, waitForPositiveButton = false) { _, _, text ->
                 navigateToOrderFragment(num, vm.getTodayDateDb(), vm.parseTime("$text"))

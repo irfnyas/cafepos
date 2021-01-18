@@ -15,11 +15,14 @@ INSERT OR REPLACE INTO active_order VALUES ?;
 selectAll:
 SELECT * FROM active_order;
 
+selectAllDistinct:
+SELECT DISTINCT num, date, time FROM active_order;
+
 selectAllTodayForTable:
 SELECT DISTINCT time FROM active_order WHERE num = ? AND date = ?;
 
 selectAllTimeForTable:
-SELECT * FROM active_order  WHERE num = ? AND date = ? AND time = ?;
+SELECT * FROM active_order WHERE num = ? AND date = ? AND time = ?;
 
 delete:
 DELETE FROM active_order WHERE id = ?;

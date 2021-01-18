@@ -59,8 +59,5 @@
             android:padding="12dp"/>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/grey_400"/>
+    <include layout="@layout/item_line"/>
 </androidx.appcompat.widget.LinearLayoutCompat>

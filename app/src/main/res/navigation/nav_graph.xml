@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_homeFragment_to_menuFragment"
             app:destination="@id/menuFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_historyFragment"
+            app:destination="@id/historyFragment" />
     </fragment>
     <fragment
         android:id="@+id/orderFragment"
@@ -35,4 +38,8 @@
         android:id="@+id/menuFragment"
         android:name="co.wangun.cafepos.view.fragment.MenuFragment"
         android:label="MenuFragment" />
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="co.wangun.cafepos.view.fragment.HistoryFragment"
+        android:label="HistoryFragment" />
 </navigation>
