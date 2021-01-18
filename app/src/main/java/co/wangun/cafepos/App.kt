@@ -40,5 +40,5 @@ class App: Application() {
         val su: SessionUtils by lazy { SessionUtils() }
     }
 
-    // TODO:
+    //
 }
