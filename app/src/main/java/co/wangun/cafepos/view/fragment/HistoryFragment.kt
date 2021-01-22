@@ -60,13 +60,17 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
                     val time = itemSplit[2]
 
                     // init view
-                    val titleText = findViewById<AppCompatTextView>(R.id.text_title_history)
-                    val captionText = findViewById<AppCompatTextView>(R.id.text_caption_history)
+                    val invText = findViewById<AppCompatTextView>(R.id.text_invoice_history)
+                    val tableText = findViewById<AppCompatTextView>(R.id.text_table_history)
+                    val dateText = findViewById<AppCompatTextView>(R.id.text_date_history)
+                    val timeText = findViewById<AppCompatTextView>(R.id.text_time_history)
                     val detailBtn = findViewById<FloatingActionButton>(R.id.btn_detail_history)
 
                     // set view
-                    titleText.text = "Table $num ($time)"
-                    captionText.text = date
+                    invText.text = avm.invoiceInReceipt(item,false)
+                    tableText.text = "Table $num"
+                    dateText.text = date
+                    timeText.text = time
                     detailBtn.setOnClickListener { createDetailDialog(item) }
                 } })
                 .into(bind.rvHistories)
@@ -93,7 +97,7 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
                 val rvItems = findViewById<RecyclerView>(R.id.rv_items_receipt)
 
                 // set text
-                invoiceText.text = avm.invoiceInReceipt(tableInput)
+                invoiceText.text = avm.invoiceInReceipt(tableInput, true)
                 tableText.text = avm.tableInReceipt(tableInput)
                 totalText.text = avm.totalInReceipt(tableInput)
 
