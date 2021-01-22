@@ -69,8 +69,8 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
     }
 
     private fun setTitle() {
-        val titleText = "Table ${args.tableOrder} (${args.dateOrder} ${args.timeOrder})"
-        bind.textTitleOrder.text = titleText
+        val tableInput = "${args.tableOrder}?${args.dateOrder}?${args.timeOrder}"
+        bind.textTitleOrder.text = avm.invoiceInReceipt(tableInput, false)
     }
 
     private fun setInvoice() {

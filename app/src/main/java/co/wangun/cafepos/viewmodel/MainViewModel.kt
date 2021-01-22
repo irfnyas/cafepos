@@ -20,7 +20,7 @@ class MainViewModel: ViewModel() {
         return "£ %.2f".format(num)
     }
 
-    fun invoiceInReceipt(tableInput: String): String {
+    fun invoiceInReceipt(tableInput: String, forReceipt: Boolean): String {
         val itemSplit = tableInput.split("?")
         val num = "#${itemSplit[0]}"
         val date = itemSplit[1].replace("-","")
@@ -33,7 +33,7 @@ class MainViewModel: ViewModel() {
         val invLen = inv.length
         val space = " ".repeat(totalLen - staticLen - invLen)
 
-        return "$static$space$inv"
+        return if(forReceipt) "$static$space$inv" else "$inv"
     }
 
     fun tableInReceipt(tableInput: String): String {
