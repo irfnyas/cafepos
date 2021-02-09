@@ -2,19 +2,20 @@ package co.wangun.cafepos.view.fragment
 
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.viewbinding.library.fragment.viewBinding
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import co.wangun.cafepos.App.Companion.cxt
-import co.wangun.cafepos.App.Companion.fu
 import co.wangun.cafepos.App.Companion.su
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.FragmentHomeBinding
+import co.wangun.cafepos.util.SessionUtils
+import co.wangun.cafepos.util.SessionUtils.Companion.LoggedInUserId_LON
 import co.wangun.cafepos.util.SessionUtils.Companion.TablesAmount_INT
 import co.wangun.cafepos.viewmodel.HomeViewModel
 import co.wangun.cafepos.viewmodel.MainViewModel
@@ -42,8 +43,11 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun initFun() {
-        initRecycler()
-        initBtn()
+        val userId = (SessionUtils().get(LoggedInUserId_LON) ?: -1) as Long
+        if(userId < 0) navigateToLoginFragment() else {
+            initRecycler()
+            initBtn()
+        }
     }
 
     private fun initBtn() {
@@ -61,6 +65,11 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
     private fun navigateToMenuFragment() {
         val action = R.id.action_homeFragment_to_menuFragment
+        findNavController().navigate(action)
+    }
+
+    private fun navigateToLoginFragment() {
+        val action = R.id.action_homeFragment_to_loginFragment
         findNavController().navigate(action)
     }
 
@@ -86,7 +95,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                 gravity = Gravity.CENTER
                 post { selectAll() }
                 setBackgroundColor(resources.getColor(
-                    android.R.color.transparent, null
+                        android.R.color.transparent, null
                 ))
             }
         }
@@ -98,28 +107,31 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun initRecycler() {
-
+        // init val
         val list = IntRange(1, vm.getTablesAmount()).toList()
+        val presenter = Presenter.simple(
+                cxt, R.layout.item_table, 0
+        ) { view, item: Int ->
+            (view as MaterialButton).apply {
+                text = "$item"
+                setOnClickListener {
+                    createOrderDialog(item)
+                }
+            }
+        }
 
+        // set adapter
         Adapter.builder(viewLifecycleOwner)
                 .addSource(Source.fromList(list))
-                .addPresenter(
-                        Presenter.simple(
-                                cxt, R.layout.item_table, 0
-                        ) { view, item: Int ->
-                            view as MaterialButton
-                            view.apply {
-                                text = "$item"
-                                setOnClickListener { createOrderDialog(item) }
-                            }
-                        })
+                .addPresenter(presenter)
                 .into(bind.rvTables)
     }
 
     private fun createOrderDialog(num: Int) {
-
+        // init val
         val list = vm.getTodayOrderForTable(num).sortedDescending()
 
+        // create dialog
         MaterialDialog(cxt).show {
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)

@@ -1,6 +1,7 @@
 package co.wangun.cafepos.util
 
 import android.content.Context
+import android.util.DisplayMetrics
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import co.wangun.cafepos.App.Companion.cxt
@@ -18,5 +19,11 @@ class FunUtils {
     fun resetDb() {
         sqlDriver.close()
         cxt.deleteDatabase("${cxt.getString(R.string.app_name)}.db")
+    }
+
+    fun calColumns(size: Int): Int {
+        val displayMetrics: DisplayMetrics = cxt.resources.displayMetrics
+        val dpWidth = displayMetrics.heightPixels / displayMetrics.density
+        return (dpWidth / size).toInt()
     }
 }

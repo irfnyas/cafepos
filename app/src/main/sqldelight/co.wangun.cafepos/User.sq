@@ -1,0 +1,30 @@
+CREATE TABLE IF NOT EXISTS user (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name TEXT UNIQUE NOT NULL,
+    pass TEXT,
+    role TEXT
+);
+
+selectAll:
+SELECT * FROM user;
+
+insert:
+INSERT OR REPLACE INTO user VALUES ?;
+
+find:
+SELECT * FROM user WHERE name = ?;
+--
+-- selectAllCategories:
+-- SELECT DISTINCT category FROM menu;
+--
+-- find:
+-- SELECT * FROM menu WHERE name LIKE ? OR name LIKE ? OR name LIKE ?;
+--
+-- delete:
+-- DELETE FROM menu WHERE id = ?;
+--
+-- deleteAll:
+-- DELETE FROM menu;
+--
+-- count:
+-- SELECT COUNT (*) FROM menu;

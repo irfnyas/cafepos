@@ -17,7 +17,6 @@ import co.wangun.cafepos.App.Companion.cxt
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.FragmentOrderBinding
 import co.wangun.cafepos.viewmodel.MainViewModel
-import co.wangun.cafepos.viewmodel.MenuViewModel
 import co.wangun.cafepos.viewmodel.OrderViewModel
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView

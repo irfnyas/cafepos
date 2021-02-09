@@ -1,8 +1,8 @@
 package co.wangun.cafepos.view
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.viewbinding.library.activity.viewBinding
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import co.wangun.cafepos.App.Companion.cxt
 import co.wangun.cafepos.R

@@ -1,13 +1,9 @@
 package co.wangun.cafepos.viewmodel
 
-import android.util.DisplayMetrics
 import androidx.lifecycle.ViewModel
-import co.wangun.cafepos.App
-import co.wangun.cafepos.App.Companion.cxt
 import co.wangun.cafepos.App.Companion.db
 import co.wangun.cafepos.App.Companion.su
 import co.wangun.cafepos.util.SessionUtils
-import cowanguncafepos.Active_order
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -16,15 +12,9 @@ class HomeViewModel: ViewModel() {
 
     private val TAG: String by lazy { javaClass.simpleName }
 
-    fun calColumns(size: Int): Int {
-        val displayMetrics: DisplayMetrics = cxt.resources.displayMetrics
-        val dpWidth = displayMetrics.heightPixels / displayMetrics.density
-        return (dpWidth / size).toInt()
-    }
-
     fun getTodayOrderForTable(num: Int): List<String> {
         return db.orderQueries.selectAllTodayForTable(num.toLong(), getTodayDateDb())
-            .executeAsList().mapIndexed { i, item -> "Order ${i + 1} - Created at ${item.time}" }
+            .executeAsList().mapIndexed { i, item -> "Order ${ i + 1 } - Created at ${item.time}" }
     }
 
     fun getTablesAmount(): Int {

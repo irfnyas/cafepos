@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Cafe POS</string>
     <string name="currency">£</string>
+    <string name="login_empty">Field must not be empty</string>
+    <string name="login_invalid">Credential not found. Please check your username or password.</string>
 </resources>

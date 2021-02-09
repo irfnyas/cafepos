@@ -6,9 +6,12 @@ import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import co.wangun.cafepos.db.DbClient.sqlDriver
+import co.wangun.cafepos.util.CryptUtils
 import co.wangun.cafepos.util.FunUtils
 import co.wangun.cafepos.util.SessionUtils
+import co.wangun.cafepos.view.MainActivity
 import com.facebook.stetho.Stetho
+import kotlin.properties.Delegates
 
 class App: Application() {
 
@@ -18,9 +21,6 @@ class App: Application() {
     }
 
     private fun initFun() {
-        // init val
-        cxt = this
-
         // init day/night mode
         setDefaultNightMode(MODE_NIGHT_NO)
 
@@ -29,15 +29,18 @@ class App: Application() {
     }
 
     private fun initDebug() {
-        Stetho.initializeWithDefaults(this)
         // fu.resetDb()
+        Stetho.initializeWithDefaults(this)
+        isDebug = true
     }
 
     companion object {
-        lateinit var cxt: Context
-        val db: Database by lazy { Database(sqlDriver) }
-        val fu: FunUtils by lazy { FunUtils() }
-        val su: SessionUtils by lazy { SessionUtils() }
+        lateinit var cxt: MainActivity
+        var isDebug by Delegates.notNull<Boolean>()
+        val db by lazy { Database(sqlDriver) }
+        val cu by lazy { CryptUtils() }
+        val fu by lazy { FunUtils() }
+        val su by lazy { SessionUtils() }
     }
 
     //
