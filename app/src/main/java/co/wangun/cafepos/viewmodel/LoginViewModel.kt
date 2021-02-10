@@ -1,11 +1,11 @@
 package co.wangun.cafepos.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import co.wangun.cafepos.App.Companion.cu
 import co.wangun.cafepos.App.Companion.db
 import co.wangun.cafepos.App.Companion.su
-import co.wangun.cafepos.util.SessionUtils.Companion.LoggedInUserId_LON
+import co.wangun.cafepos.util.SessionUtils.Companion.LoggedInUserNick_STR
+import co.wangun.cafepos.util.SessionUtils.Companion.LoggedInUser_STR
 import cowanguncafepos.User
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -21,7 +21,8 @@ class LoginViewModel: ViewModel() {
                             0,
                             "master_admin",
                             cu.encrypt("123456"),
-                            "Owner"
+                            "Master Admin",
+                            "OWNER"
                     )
             )
         }
@@ -42,7 +43,10 @@ class LoginViewModel: ViewModel() {
         if (foundUser != null && isPassValid) valid = true
 
         // save session
-        if(valid) su.set(LoggedInUserId_LON, foundUser?.id ?: 0)
+        if(valid) {
+            su.set(LoggedInUser_STR, foundUser?.name ?: "")
+            su.set(LoggedInUserNick_STR, foundUser?.nick ?: "")
+        }
 
         // return valid
         return valid

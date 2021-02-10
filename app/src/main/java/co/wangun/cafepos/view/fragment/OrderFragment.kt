@@ -14,8 +14,10 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import co.wangun.cafepos.App.Companion.cxt
+import co.wangun.cafepos.App.Companion.su
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.FragmentOrderBinding
+import co.wangun.cafepos.util.SessionUtils.Companion.LoggedInUserNick_STR
 import co.wangun.cafepos.viewmodel.MainViewModel
 import co.wangun.cafepos.viewmodel.OrderViewModel
 import com.afollestad.materialdialogs.MaterialDialog
@@ -176,7 +178,8 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
         vm.postOrder(
                 Active_order(
                         item.id, item.name, amount, item.price,
-                        note, item.num, item.date, item.time
+                        note, item.num, item.date, item.time,
+                        "${su.get(LoggedInUserNick_STR)}"
                 )
         )
         if(refresh) initView()
@@ -230,7 +233,7 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
     private fun prePostOrder(chosen: Menu?) {
         val order = Active_order(vm.countOrder() + 1, chosen?.name, 1,
                 chosen?.price ?: 0.0, "", args.tableOrder.toLong(),
-                args.dateOrder, args.timeOrder )
+                args.dateOrder, args.timeOrder, "${su.get(LoggedInUserNick_STR)}")
         vm.postOrder(order)
         initView()
     }

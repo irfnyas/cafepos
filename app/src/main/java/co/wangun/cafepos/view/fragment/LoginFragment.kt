@@ -17,7 +17,7 @@ import co.wangun.cafepos.viewmodel.LoginViewModel
 @SuppressLint("SetTextI18n")
 class LoginFragment: Fragment(R.layout.fragment_login) {
 
-    private val TAG: String by lazy { javaClass.simpleName }
+    private val TAG by lazy { javaClass.simpleName }
     private val vm: LoginViewModel by viewModels()
     private val bind: FragmentLoginBinding by viewBinding()
 

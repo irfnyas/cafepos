@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS user (
     id INTEGER PRIMARY KEY NOT NULL,
     name TEXT UNIQUE NOT NULL,
     pass TEXT,
+    nick TEXT,
     role TEXT
 );
 

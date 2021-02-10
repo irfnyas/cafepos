@@ -36,10 +36,10 @@ class SessionUtils {
     }
 
     private fun getStr(key: String): String? = sp.getString(key, "")
-    private fun getInt(key: String): Int = sp.getInt(key, -1)
+    private fun getInt(key: String): Int = sp.getInt(key, 0)
     private fun getBool(key: String): Boolean = sp.getBoolean(key, false)
-    private fun getFloat(key: String): Float = sp.getFloat(key, -1f)
-    private fun getLong(key: String): Long = sp.getLong(key, -1)
+    private fun getFloat(key: String): Float = sp.getFloat(key, 0f)
+    private fun getLong(key: String): Long = sp.getLong(key, 0)
 
     private fun setStr(key: String, value: String) = ed.putString(key, value).apply()
     private fun setInt(key: String, value: Int) = ed.putInt(key, value).apply()
@@ -49,7 +49,8 @@ class SessionUtils {
 
     // const
     companion object {
-        const val LoggedInUserId_LON = "LoggedInUserId_LON"
+        const val LoggedInUser_STR = "LoggedInUser_STR"
+        const val LoggedInUserNick_STR = "LoggedInUserNick_STR"
         const val TablesAmount_INT = "TablesAmount_INT"
         const val TablesSpansCount_INT = "TablesSpansCount_INT"
     }

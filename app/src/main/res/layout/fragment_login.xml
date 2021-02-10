@@ -52,7 +52,7 @@
         app:layout_constraintStart_toStartOf="@id/lay_user"
         app:layout_constraintEnd_toEndOf="@id/lay_user"
         app:layout_constraintBottom_toTopOf="@id/btn_login"
-        app:passwordToggleEnabled="true"
+        app:endIconMode="password_toggle"
         android:layout_marginTop="16dp"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:hint="Password">
@@ -60,7 +60,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edit_pass"
             android:layout_width="match_parent"
-            android:inputType="textImeMultiLine"
+            android:inputType="textPassword"
             android:maxLines="1"
             android:imeOptions="actionDone"
             android:layout_height="wrap_content"/>

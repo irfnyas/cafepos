@@ -26,7 +26,8 @@
     <fragment
         android:id="@+id/orderFragment"
         android:name="co.wangun.cafepos.view.fragment.OrderFragment"
-        android:label="OrderFragment" >
+        android:label="fragment_order"
+        tools:layout="@layout/fragment_order">
         <argument
             android:name="tableOrder"
             app:argType="integer" />
@@ -40,11 +41,13 @@
     <fragment
         android:id="@+id/menuFragment"
         android:name="co.wangun.cafepos.view.fragment.MenuFragment"
-        android:label="MenuFragment" />
+        android:label="fragment_menu"
+        tools:layout="@layout/fragment_menu" />
     <fragment
         android:id="@+id/historyFragment"
         android:name="co.wangun.cafepos.view.fragment.HistoryFragment"
-        android:label="HistoryFragment" />
+        android:label="fragment_history"
+        tools:layout="@layout/fragment_history" />
     <fragment
         android:id="@+id/loginFragment"
         android:name="co.wangun.cafepos.view.fragment.LoginFragment"

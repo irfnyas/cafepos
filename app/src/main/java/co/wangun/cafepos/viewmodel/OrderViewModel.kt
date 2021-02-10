@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import co.wangun.cafepos.App.Companion.db
 import cowanguncafepos.Active_order
 import cowanguncafepos.Menu
-import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
 class OrderViewModel: ViewModel() {
@@ -27,7 +26,7 @@ class OrderViewModel: ViewModel() {
     }
 
     fun countOrder(): Long {
-        return db.orderQueries.count().executeAsOne()
+        return db.orderQueries.count().executeAsOneOrNull() ?: 0
     }
 
     fun postOrder(order: Active_order) {
