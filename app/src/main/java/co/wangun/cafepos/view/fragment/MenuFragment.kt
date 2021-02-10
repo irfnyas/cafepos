@@ -66,18 +66,18 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
         val categories = vm.getAllCategories()
 
         MaterialDialog(cxt).show {
-            lifecycleOwner(viewLifecycleOwner)
-            title(text = titleDialog)
             noAutoDismiss()
             cancelable(false)
+            lifecycleOwner(viewLifecycleOwner)
+            title(text = titleDialog)
             customView(R.layout.dialog_menu, scrollable = true, horizontalPadding = true)
             cornerRadius(24f)
 
             val spinnerCats = view.findViewById<PowerSpinnerView>(R.id.spinner_categories)
             val btnNewCat = view.findViewById<FloatingActionButton>(R.id.btn_new_category)
-            val fldName = view.findViewById<TextInputEditText>(R.id.fld_name_menu)
-            val fldDesc = view.findViewById<TextInputEditText>(R.id.fld_desc_menu)
-            val fldPrice = view.findViewById<TextInputEditText>(R.id.fld_price_menu)
+            val editName = view.findViewById<TextInputEditText>(R.id.edit_name_menu)
+            val editDesc = view.findViewById<TextInputEditText>(R.id.edit_desc_menu)
+            val editPrice = view.findViewById<TextInputEditText>(R.id.edit_price_menu)
             val layName = view.findViewById<TextInputLayout>(R.id.lay_name_menu)
 
             if (menu != null) {
@@ -90,8 +90,8 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
             negativeButton(text = "Back") { dismiss() }
             positiveButton(text = positiveText) {
                 val id = menu?.id ?: vm.countMenu()+1
-                val price = fldPrice.text.toString().toDouble()
-                val newMenu = Menu(id, "${fldName.text}", "${fldDesc.text}",
+                val price = editPrice.text.toString().toDouble()
+                val newMenu = Menu(id, "${editName.text}", "${editDesc.text}",
                     "${spinnerCats.text}", price)
 
                 if (vm.isMenuFormValid(newMenu, isNew)) {
@@ -99,12 +99,12 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
                     dismiss()
                     initRecycler()
                 } else {
-                    if(fldName.text.isNullOrBlank()) {
+                    if(editName.text.isNullOrBlank()) {
                         layName.error = "Name must not be empty"
                     }
 
-                    if(isNew && vm.isMenuListed("$fldName")) {
-                        layName.error = "$fldName is already on the menu"
+                    if(isNew && vm.isMenuListed("$editName")) {
+                        layName.error = "$editName is already on the menu"
                     }
 
                     if(spinnerCats.text.isNullOrBlank()) {
@@ -155,9 +155,9 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
 
                 }
 
-                fldName.setText(menu?.name)
-                fldDesc.setText(menu?.desc)
-                fldPrice.setText("${menu?.price ?: 0.0}")
+                editName.setText(menu?.name)
+                editDesc.setText(menu?.desc)
+                editPrice.setText("${menu?.price ?: 0.0}")
             }
         }
     }

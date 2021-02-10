@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS printer (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name TEXT UNIQUE NOT NULL,
+    address TEXT
+);
+
+selectAll:
+SELECT * FROM printer;
+
+insert:
+INSERT OR REPLACE INTO printer VALUES ?;
+
+find:
+SELECT * FROM printer WHERE name = ?;
+
+delete:
+DELETE FROM printer WHERE id = ?;
+
+deleteAll:
+DELETE FROM printer;
+
+count:
+SELECT COUNT (*) FROM printer;

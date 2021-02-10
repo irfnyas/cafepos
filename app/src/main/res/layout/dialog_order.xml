@@ -13,11 +13,10 @@
         android:id="@+id/lay_item_order"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:hint="Search item">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/fld_item_order"
+            android:id="@+id/edit_item_order"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="A"

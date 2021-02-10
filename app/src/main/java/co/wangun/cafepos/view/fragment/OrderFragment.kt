@@ -202,7 +202,7 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
 
             val allItems = vm.getAllMenu()
             val allOrders = vm.getAllOrders()
-            val search = view.findViewById<TextInputEditText>(R.id.fld_item_order)
+            val search = view.findViewById<TextInputEditText>(R.id.edit_item_order)
             val spinner = view.findViewById<PowerSpinnerView>(R.id.spinner_items)
 
             spinner.setItems(allItems.map { it.name })

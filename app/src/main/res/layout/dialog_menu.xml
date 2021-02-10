@@ -62,7 +62,7 @@
         android:hint="Name">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/fld_name_menu"
+            android:id="@+id/edit_name_menu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="A"
@@ -80,7 +80,7 @@
         android:layout_marginTop="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/fld_desc_menu"
+            android:id="@+id/edit_desc_menu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:selectAllOnFocus="true"
@@ -97,7 +97,7 @@
         android:layout_marginTop="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/fld_price_menu"
+            android:id="@+id/edit_price_menu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"

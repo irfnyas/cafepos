@@ -2,13 +2,11 @@ package co.wangun.cafepos.view.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.viewbinding.library.fragment.viewBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import co.wangun.cafepos.App.Companion.cu
 import co.wangun.cafepos.App.Companion.isDebug
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.FragmentLoginBinding
@@ -53,11 +51,11 @@ class LoginFragment: Fragment(R.layout.fragment_login) {
 
         // check field not empty
         bind.layUser.error = if(user.isBlank()) {
-            valid = false; getString(R.string.login_empty)
+            valid = false; getString(R.string.edit_empty)
         } else ""
 
         bind.layPass.error = if(pass.isBlank()) {
-            valid = false; getString(R.string.login_empty)
+            valid = false; getString(R.string.edit_empty)
         } else ""
 
         // check credential
