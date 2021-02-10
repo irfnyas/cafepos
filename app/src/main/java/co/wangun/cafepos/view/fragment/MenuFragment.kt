@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import co.wangun.cafepos.App.Companion.cxt
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.FragmentMenuBinding
 import co.wangun.cafepos.viewmodel.MainViewModel
@@ -65,7 +64,7 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
         val positiveText = if (isNew) "Add" else "Confirm"
         val categories = vm.getAllCategories()
 
-        MaterialDialog(cxt).show {
+        MaterialDialog(requireContext()).show {
             noAutoDismiss()
             cancelable(false)
             lifecycleOwner(viewLifecycleOwner)
@@ -135,7 +134,7 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
                         }
                     }
 
-                    MaterialDialog(cxt).show {
+                    MaterialDialog(requireContext()).show {
                         lifecycleOwner(viewLifecycleOwner)
                         cornerRadius(24f)
                         cancelable(false)
@@ -165,7 +164,7 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
     private fun initRecycler() {
         Adapter.builder(viewLifecycleOwner)
             .addSource(Source.fromList(vm.getAllMenu()))
-            .addPresenter(Presenter.simple(cxt, R.layout.item_menu, 0)
+            .addPresenter(Presenter.simple(requireContext(), R.layout.item_menu, 0)
             { view, item: Menu ->
                 view.apply {
                     // init view

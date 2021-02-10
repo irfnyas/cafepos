@@ -76,10 +76,6 @@ class HomeViewModel: ViewModel() {
         return input == passDecrypted
     }
 
-    fun getAllPrinters(): List<Printer> {
-        return db.printerQueries.selectAll().executeAsList().sortedBy { it.name }
-    }
-
     fun getNewPrinterId(): Long {
         return db.printerQueries.count().executeAsOne().plus(1)
     }

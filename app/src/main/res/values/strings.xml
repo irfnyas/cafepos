@@ -5,4 +5,5 @@
     <string name="login_invalid">Credential not found. Please check your username or password.</string>
     <string name="pass_new_invalid">Incorrect new password. Please check your input.</string>
     <string name="pass_old_invalid">Incorrect password. Please check your input.</string>
+    <string name="msg_list_empty">This list is empty. Please add a new one first.</string>
 </resources>

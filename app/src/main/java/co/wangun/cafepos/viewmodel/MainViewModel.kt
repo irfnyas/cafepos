@@ -8,6 +8,7 @@ import co.wangun.cafepos.App.Companion.db
 import co.wangun.cafepos.App.Companion.su
 import co.wangun.cafepos.util.SessionUtils.Companion.TablesAmount_INT
 import cowanguncafepos.Menu
+import cowanguncafepos.Printer
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,7 +34,7 @@ class MainViewModel: ViewModel() {
         val invLen = inv.length
         val space = " ".repeat(totalLen - staticLen - invLen)
 
-        return if(forReceipt) "$static$space$inv" else "$inv"
+        return if(forReceipt) "$static$space$inv" else inv
     }
 
     fun tableInReceipt(tableInput: String): String {
@@ -86,5 +87,9 @@ class MainViewModel: ViewModel() {
 
         val space = " ".repeat(totalLen - nameLen - amountLen - priceLen)
         return "${amount}${name}${space}${price}"
+    }
+
+    fun getPrinters(): List<Printer> {
+        return db.printerQueries.selectAll().executeAsList().sortedBy { it.name }
     }
 }

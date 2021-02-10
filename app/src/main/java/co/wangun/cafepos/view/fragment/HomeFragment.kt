@@ -6,12 +6,13 @@ import android.view.Gravity
 import android.view.View
 import android.viewbinding.library.fragment.viewBinding
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import co.wangun.cafepos.App.Companion.cxt
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.FragmentHomeBinding
 import co.wangun.cafepos.viewmodel.HomeViewModel
+import co.wangun.cafepos.viewmodel.MainViewModel
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
@@ -33,7 +34,7 @@ import cowanguncafepos.Printer
 class HomeFragment: Fragment(R.layout.fragment_home) {
 
     private val TAG by lazy { javaClass.simpleName }
-    //private val avm: MainViewModel by activityViewModels()
+    private val avm: MainViewModel by activityViewModels()
     private val vm: HomeViewModel by viewModels()
     private val bind: FragmentHomeBinding by viewBinding()
 
@@ -78,7 +79,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         // init val
         val list = IntRange(1, vm.getTablesAmount()).toList()
         val presenter = Presenter.simple(
-                cxt, R.layout.item_table, 0
+                requireContext(), R.layout.item_table, 0
         ) { view, item: Int ->
             (view as MaterialButton).apply {
                 text = "$item"
@@ -98,7 +99,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     // Dialog
     //
     private fun createOldPassDialog() {
-        MaterialDialog(cxt).show {
+        MaterialDialog(requireContext()).show {
             noAutoDismiss()
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
@@ -126,7 +127,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun createNewPassDialog() {
-        MaterialDialog(cxt).show {
+        MaterialDialog(requireContext()).show {
             noAutoDismiss()
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
@@ -152,7 +153,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun createConfirmPassDialog(newPass: String, newPassDialog: MaterialDialog) {
-        MaterialDialog(cxt).show {
+        MaterialDialog(requireContext()).show {
             noAutoDismiss()
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
@@ -185,7 +186,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
     private fun createAccountDialog() {
         val list = listOf("User Management", "Change My Password", "Logout")
-        MaterialDialog(cxt).show {
+        MaterialDialog(requireContext()).show {
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
             negativeButton(text = "Back")
@@ -201,7 +202,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun createLogoutDialog() {
-        MaterialDialog(cxt).show {
+        MaterialDialog(requireContext()).show {
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
             title(text = "Confirm Logout")
@@ -212,12 +213,13 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun createTablesDialog() {
-        MaterialDialog(cxt).show {
+        MaterialDialog(requireContext()).show {
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
             negativeButton(text = "Back")
             positiveButton(text = "Confirm")
-            title(text = "Tables Amount")
+            title(text = "Edit Tables")
+            message(text = "How many tables can you serve today?")
             input(
                     hint = "Input the amount...",
                     prefill = "${vm.getTablesAmount()}",
@@ -238,7 +240,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         val list = vm.getTodayOrderForTable(num).sortedDescending()
 
         // create dialog
-        MaterialDialog(cxt).show {
+        MaterialDialog(requireContext()).show {
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
             title(text = "Table $num (${vm.getTodayDate()})")
@@ -249,16 +251,19 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
             listItems(items = list, waitForPositiveButton = false) { _, _, text ->
                 navToOrderFragment(num, vm.parseTime("$text"))
             }
+            if (list.isEmpty()) {
+                message(text = getString(R.string.msg_list_empty))
+            }
         }
     }
 
     private fun createPrinterDialog() {
         // init val
-        val printers = vm.getAllPrinters()
+        val printers = avm.getPrinters()
         val list = printers.map { "${it.name} - ${it.address}" }
 
         // create dialog
-        MaterialDialog(cxt).show {
+        MaterialDialog(requireContext()).show {
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
             title(text = "Edit Printer")
@@ -272,13 +277,16 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                 createPrinterDetailDialog(printer)
                 dismiss()
             }
+            if (list.isEmpty()) {
+                message(text = getString(R.string.msg_list_empty))
+            }
         }
     }
 
     private fun createPrinterDetailDialog(printer: Printer?) {
         val title = if (printer != null) "Edit ${printer.name}" else "Add New Printer"
 
-        MaterialDialog(cxt).onDismiss {
+        MaterialDialog(requireContext()).onDismiss {
             createPrinterDialog()
         }.show {
             noAutoDismiss()

@@ -10,7 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import co.wangun.cafepos.App.Companion.cxt
+import co.wangun.cafepos.App.Companion.fu
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.FragmentHistoryBinding
 import co.wangun.cafepos.viewmodel.HistoryViewModel
@@ -18,6 +18,7 @@ import co.wangun.cafepos.viewmodel.MainViewModel
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
+import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.otaliastudios.elements.Adapter
 import com.otaliastudios.elements.Presenter
@@ -48,46 +49,46 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
     }
 
     private fun initRecycler() {
-        val source = vm.getAllOrders().sortedDescending()
+        val source = vm.getAllOrders()
+        val presenter = Presenter.simple(requireContext(), R.layout.item_history, 0)
+        { view, item: String ->
+            // init val
+            val itemSplit = item.split("?")
+            val num = itemSplit[0]
+            val date = itemSplit[1]
+            val time = itemSplit[2]
+
+            // init view
+            val invText = view.findViewById<AppCompatTextView>(R.id.text_invoice_history)
+            val tableText = view.findViewById<AppCompatTextView>(R.id.text_table_history)
+            val dateText = view.findViewById<AppCompatTextView>(R.id.text_date_history)
+            val timeText = view.findViewById<AppCompatTextView>(R.id.text_time_history)
+            val detailBtn = view.findViewById<FloatingActionButton>(R.id.btn_detail_history)
+
+            // set view
+            invText.text = avm.invoiceInReceipt(item,false)
+            tableText.text = "Table $num"
+            dateText.text = date
+            timeText.text = time
+            detailBtn.setOnClickListener { createDetailDialog(item) }
+        }
+
         Adapter.builder(viewLifecycleOwner)
                 .addSource(Source.fromList(source))
-                .addPresenter(Presenter.simple(cxt, R.layout.item_history, 0)
-                { view, item: String -> view.apply {
-                    // init val
-                    val itemSplit = item.split("?")
-                    val num = itemSplit[0]
-                    val date = itemSplit[1]
-                    val time = itemSplit[2]
-
-                    // init view
-                    val invText = findViewById<AppCompatTextView>(R.id.text_invoice_history)
-                    val tableText = findViewById<AppCompatTextView>(R.id.text_table_history)
-                    val dateText = findViewById<AppCompatTextView>(R.id.text_date_history)
-                    val timeText = findViewById<AppCompatTextView>(R.id.text_time_history)
-                    val detailBtn = findViewById<FloatingActionButton>(R.id.btn_detail_history)
-
-                    // set view
-                    invText.text = avm.invoiceInReceipt(item,false)
-                    tableText.text = "Table $num"
-                    dateText.text = date
-                    timeText.text = time
-                    detailBtn.setOnClickListener { createDetailDialog(item) }
-                } })
+                .addPresenter(presenter)
                 .into(bind.rvHistories)
     }
 
     private fun createDetailDialog(tableInput: String) {
-        MaterialDialog(cxt).show {
+        MaterialDialog(requireContext()).show {
             lifecycleOwner(viewLifecycleOwner)
+            cornerRadius(24f)
             customView(
                     R.layout.dialog_receipt,
                     horizontalPadding = true,
                     scrollable = true,
                     dialogWrapContent = true
             )
-            cornerRadius(24f)
-            negativeButton(text = "Back")
-            positiveButton(text = "Print")
 
             view.apply {
                 // init view
@@ -103,11 +104,47 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
 
                 // set recycler
                 val source = vm.getDetailOrders(tableInput)
+                val presenter = Presenter.simple(
+                        requireContext(), R.layout.item_receipt, 0
+                ) { view, item: String -> (view as AppCompatTextView).text = item }
+
                 Adapter.builder(viewLifecycleOwner)
                         .addSource(Source.fromList(source))
-                        .addPresenter(Presenter.simple(cxt, R.layout.item_receipt, 0
-                        ) { view, item: String -> (view as AppCompatTextView).text = item })
+                        .addPresenter(presenter)
                         .into(rvItems)
+
+                // set dialog btn
+                negativeButton(text = "Back")
+                positiveButton(text = "Print") {
+                    createPrintDialog(
+                            "${invoiceText.text}",
+                            "${tableText.text}",
+                            "${totalText.text}",
+                            source
+                    )
+                }
+            }
+        }
+    }
+
+    private fun createPrintDialog(
+            invoice: String, table: String, total: String, items: List<String>
+    ) {
+        val printers = avm.getPrinters()
+        val list = printers.map { "${it.name} - ${it.address}" }
+
+        MaterialDialog(requireContext()).show {
+            lifecycleOwner(viewLifecycleOwner)
+            cornerRadius(24f)
+            title(text = "Select Printer")
+            negativeButton(text = "Back")
+            positiveButton(text = "Print")
+            listItemsSingleChoice(items = list) { _, _, text ->
+                val printer = text.split(" - ")[1]
+                fu.print(printer, invoice, table, total, items)
+            }
+            if (list.isEmpty()) {
+                message(text = getString(R.string.msg_list_empty))
             }
         }
     }

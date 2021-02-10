@@ -1,7 +1,6 @@
 package co.wangun.cafepos
 
 import android.app.Application
-import android.content.Context
 import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
