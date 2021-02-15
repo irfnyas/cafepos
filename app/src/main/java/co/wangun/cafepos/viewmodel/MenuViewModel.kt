@@ -9,7 +9,7 @@ import java.util.*
 @Suppress("MemberVisibilityCanBePrivate")
 class MenuViewModel: ViewModel() {
 
-    private val TAG: String by lazy { javaClass.simpleName }
+    private val TAG by lazy { javaClass.simpleName }
 
     fun postMenu(menu: Menu) {
         db.menuQueries.insert(menu)
@@ -33,10 +33,5 @@ class MenuViewModel: ViewModel() {
 
     fun deleteMenu(id: Long) {
         db.menuQueries.delete(id)
-    }
-
-    fun isMenuFormValid(menu: Menu, isNew: Boolean): Boolean {
-        return if (isNew) !(menu.name.isBlank() or menu.category.isNullOrBlank() or isMenuListed(menu.name))
-        else !(menu.name.isBlank() or menu.category.isNullOrBlank())
     }
 }

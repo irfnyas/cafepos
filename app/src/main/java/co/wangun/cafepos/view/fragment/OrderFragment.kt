@@ -218,7 +218,7 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
             }
 
             negativeButton(text = "Back") { dismiss() }
-            positiveButton(text = "Add") {
+            positiveButton(text = "Confirm") {
                 val chosen = allItems.find { item -> item.name == spinner.text }
                 val isAdded = allOrders.find { item -> item.name == spinner.text }
                 if(chosen == null || isAdded != null) {
