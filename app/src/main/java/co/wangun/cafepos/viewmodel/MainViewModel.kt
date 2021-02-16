@@ -59,8 +59,8 @@ class MainViewModel: ViewModel() {
         val static = "Total"
 
         val totalPrice = db.orderQueries
-            .selectAllTimeForTable(num, date, time)
-            .executeAsList().map { it.price ?: 0.0 }.sum()
+                .selectAllTimeForTable(num, date, time)
+                .executeAsList().map { it.price ?: 0.0 }.sum()
         val price = withCurrency(totalPrice)
 
         val totalLen = 27
@@ -91,5 +91,26 @@ class MainViewModel: ViewModel() {
 
     fun getPrinters(): List<Printer> {
         return db.printerQueries.selectAll().executeAsList().sortedBy { it.name }
+    }
+
+    fun getTodayDate(): String {
+        return SimpleDateFormat("dd MMM yyyy", Locale.ROOT).format(Date())
+    }
+
+    fun getDetailOrders(tableInput: String): List<String> {
+        val itemSplit = tableInput.split("?")
+        val num = itemSplit[0].toLong()
+        val date = itemSplit[1]
+        val time = itemSplit[2]
+
+        return db.orderQueries
+                .selectAllTimeForTable(num, date, time)
+                .executeAsList().map {
+                    itemInReceipt(
+                            it.name ?: "",
+                            it.amount ?: 0,
+                            it.price ?: 0.0
+                    )
+                }
     }
 }

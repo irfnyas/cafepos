@@ -88,8 +88,9 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
         binding.apply {
             fun putCategories(input: String) {
                 spinnerCategories.apply {
-                    if (categories.contains(input)) selectItemByIndex(categories.indexOf(input))
-                    else text = input.toUpperCase(Locale.ROOT)
+                    if (categories.contains(input)) {
+                        selectItemByIndex(categories.indexOf(input))
+                    } else text = input
                 }
             }
 
@@ -131,7 +132,7 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
             cornerRadius(24f)
 
             binding.apply {
-                // btn dialog
+                // dialog btn
                 if (menu != null) {
                     neutralButton(text = "Remove") {
                         vm.deleteMenu(menu.id)
@@ -187,16 +188,16 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
 
             layNameMenu.error = when {
                 editNameMenu.text.isNullOrBlank() -> {
-                    err++; "Name must not be empty"
+                    err++; getString(R.string.edit_empty)
                 }
                 vm.isMenuListed("${editNameMenu.text}") -> {
-                    err++; "${editNameMenu.text} is already on the menu"
+                    err++; getString(R.string.edit_duplicated)
                 }
                 else -> null
             }
 
             spinnerCategories.error = if(spinnerCategories.text.isNullOrBlank()) {
-                err++; "Category must not be empty"
+                err++; getString(R.string.edit_empty)
             } else null
 
             return err == 0

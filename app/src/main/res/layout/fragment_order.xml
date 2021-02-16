@@ -74,7 +74,6 @@
                 android:layout_height="wrap_content"
                 android:gravity="end"
                 android:layout_marginTop="4dp"
-                android:textColor="@color/grey_900"
                 tools:text="#1202101180845"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"/>
         </LinearLayout>
@@ -89,7 +88,7 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total"
+                android:text="Total Price"
                 android:alpha="0.5"
                 android:fontFamily="sans-serif"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
@@ -104,33 +103,65 @@
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"/>
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Payment Method"
+                android:alpha="0.5"
+                android:fontFamily="sans-serif"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_cash"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:checked="true"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                    android:text="Cash"/>
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/radio_card"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                    android:text="Card"/>
+            </RadioGroup>
+        </LinearLayout>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_new_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="New Item"
-            android:stateListAnimator="@null"
-            app:cornerRadius="24dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginVertical="4dp"
             app:icon="@drawable/ic_baseline_add_24"
-            android:paddingHorizontal="24dp"
-            android:paddingVertical="12dp"
-            app:backgroundTint="@color/grey_600"
-            android:textAllCaps="false"/>
+            style="@style/Theme.FilledButton"/>
 
         <com.google.android.material.button.MaterialButton
-            android:alpha="0.5"
+            android:id="@+id/btn_print"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Print Receipt"
-            android:stateListAnimator="@null"
-            app:cornerRadius="24dp"
-            app:icon="@drawable/ic_baseline_print_24"
-            android:paddingHorizontal="24dp"
-            android:paddingVertical="12dp"
-            android:layout_marginTop="16dp"
-            app:backgroundTint="@color/grey_600"
-            android:textAllCaps="false"/>
+            style="@style/Theme.FilledButton"
+            android:layout_marginVertical="4dp"
+            app:icon="@drawable/ic_baseline_print_24" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <View

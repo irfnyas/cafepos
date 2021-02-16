@@ -3,6 +3,7 @@ package co.wangun.cafepos.view.fragment
 import android.os.Bundle
 import android.text.InputType
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.viewbinding.library.fragment.viewBinding
 import androidx.fragment.app.Fragment
@@ -10,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import co.wangun.cafepos.R
+import co.wangun.cafepos.databinding.DialogPrinterBinding
 import co.wangun.cafepos.databinding.FragmentHomeBinding
 import co.wangun.cafepos.viewmodel.HomeViewModel
 import co.wangun.cafepos.viewmodel.MainViewModel
@@ -66,13 +68,6 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
     private fun initView() {
         bind.textNick.text = vm.getNick()
-    }
-
-    // Recycler
-    //
-    private fun putTablesAmount(input: Int) {
-        vm.putTablesAmount(input)
-        initRecycler()
     }
 
     private fun initRecycler() {
@@ -243,13 +238,13 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         MaterialDialog(requireContext()).show {
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
-            title(text = "Table $num (${vm.getTodayDate()})")
+            title(text = "Table $num (${avm.getTodayDate()})")
             negativeButton(text = "Back")
             positiveButton(text = "New Order") {
-                navToOrderFragment(num, vm.getTime())
+                navToOrderFragment(num, vm.getTime(), vm.getTodayDateDb())
             }
             listItems(items = list, waitForPositiveButton = false) { _, _, text ->
-                navToOrderFragment(num, vm.parseTime("$text"))
+                navToOrderFragment(num, vm.parseTime("$text"), vm.getTodayDateDb())
             }
             if (list.isEmpty()) {
                 message(text = getString(R.string.msg_list_empty))
@@ -284,6 +279,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun createPrinterDetailDialog(printer: Printer?) {
+        val binding = DialogPrinterBinding.inflate(LayoutInflater.from(requireContext()))
         val title = if (printer != null) "Edit ${printer.name}" else "Add New Printer"
 
         MaterialDialog(requireContext()).onDismiss {
@@ -292,22 +288,19 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
             noAutoDismiss()
             cancelable(false)
             lifecycleOwner(viewLifecycleOwner)
-            customView(R.layout.dialog_printer, horizontalPadding = true)
+            customView(view = binding.root, horizontalPadding = true)
             cornerRadius(24f)
             title(text = title)
-            view.apply {
-                val editName = findViewById<TextInputEditText>(R.id.edit_printer_name)
-                val editAddress = findViewById<TextInputEditText>(R.id.edit_printer_address)
-
-                editName.setText(printer?.name)
-                editAddress.setText(printer?.address)
+            binding.apply {
+                editPrinterName.setText(printer?.name)
+                editPrinterAddress.setText(printer?.address)
 
                 negativeButton(text = "Back") { dismiss() }
-                positiveButton(text = "Save") {
-                    if(isPrinterFieldValid(this)) {
+                positiveButton(text = "Confirm") {
+                    if(isPrinterFieldValid(binding)) {
                         vm.putPrinter(
-                                "${editName.text}",
-                                "${editAddress.text}"
+                                "${editPrinterName.text}",
+                                "${editPrinterAddress.text}"
                         )
                         dismiss()
                     }
@@ -337,13 +330,12 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     }
 
     private fun navToLoginFragment() {
-        vm.logout()
         val action = HomeFragmentDirections.actionHomeFragmentToLoginFragment()
         findNavController().navigate(action)
+        vm.logout()
     }
 
-    private fun navToOrderFragment(num: Int, time: String) {
-        val date = vm.getTodayDateDb()
+    private fun navToOrderFragment(num: Int, time: String, date: String) {
         val action = HomeFragmentDirections.actionHomeFragmentToOrderFragment(num, time, date)
         findNavController().navigate(action)
     }
@@ -354,24 +346,30 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
     // Etc
     //
-    private fun isPrinterFieldValid(view: DialogLayout): Boolean {
-        var valid = true
+    private fun putTablesAmount(input: Int) {
+        vm.putTablesAmount(input)
+        initRecycler()
+    }
 
-        view.apply {
-            val layName = findViewById<TextInputLayout>(R.id.lay_printer_name)
-            val editName = findViewById<TextInputEditText>(R.id.edit_printer_name)
-            val layAddress = findViewById<TextInputLayout>(R.id.lay_printer_address)
-            val editAddress = findViewById<TextInputEditText>(R.id.edit_printer_address)
+    private fun isPrinterFieldValid(binding: DialogPrinterBinding): Boolean {
+        var err = 0
 
-            layName.error = if(editName.text.isNullOrBlank()) {
-                valid = false; getString(R.string.edit_empty)
-            } else ""
+        binding.apply {
+            layPrinterName.error = when {
+                editPrinterName.text.isNullOrBlank() -> {
+                    err++; getString(R.string.edit_empty)
+                }
+                vm.isPrinterListed("${editPrinterName.text}") -> {
+                    err++; getString(R.string.edit_duplicated)
+                }
+                else -> null
+            }
 
-            layAddress.error = if(editAddress.text.isNullOrBlank()) {
-                valid = false; getString(R.string.edit_empty)
+            layPrinterAddress.error = if(editPrinterAddress.text.isNullOrBlank()) {
+                err++; getString(R.string.edit_empty)
             } else ""
         }
 
-        return valid
+        return err == 0
     }
 }

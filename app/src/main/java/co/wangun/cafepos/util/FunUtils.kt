@@ -28,7 +28,7 @@ class FunUtils {
         return (dpWidth / size).toInt()
     }
 
-    fun print(printer: String, invoice: String, table: String, total: String, items: List<String>) {
+    fun print(printer: String, invoice: String, total: String, items: List<String>) {
         Toast.makeText(cxt, "Printing $invoice in $printer...", Toast.LENGTH_SHORT).show()
     }
 }

@@ -2,6 +2,7 @@ package co.wangun.cafepos.view.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.viewbinding.library.fragment.viewBinding
 import androidx.appcompat.widget.AppCompatTextView
@@ -12,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import co.wangun.cafepos.App.Companion.fu
 import co.wangun.cafepos.R
+import co.wangun.cafepos.databinding.DialogReceiptBinding
 import co.wangun.cafepos.databinding.FragmentHistoryBinding
 import co.wangun.cafepos.viewmodel.HistoryViewModel
 import co.wangun.cafepos.viewmodel.MainViewModel
@@ -80,30 +82,25 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
     }
 
     private fun createDetailDialog(tableInput: String) {
+        val binding = DialogReceiptBinding.inflate(LayoutInflater.from(requireContext()))
         MaterialDialog(requireContext()).show {
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
             customView(
-                    R.layout.dialog_receipt,
+                    view = binding.root,
                     horizontalPadding = true,
                     scrollable = true,
                     dialogWrapContent = true
             )
 
-            view.apply {
-                // init view
-                val invoiceText = findViewById<AppCompatTextView>(R.id.text_invoice_receipt)
-                val tableText = findViewById<AppCompatTextView>(R.id.text_table_receipt)
-                val totalText = findViewById<AppCompatTextView>(R.id.text_total_receipt)
-                val rvItems = findViewById<RecyclerView>(R.id.rv_items_receipt)
-
+            binding.apply {
                 // set text
-                invoiceText.text = avm.invoiceInReceipt(tableInput, true)
-                tableText.text = avm.tableInReceipt(tableInput)
-                totalText.text = avm.totalInReceipt(tableInput)
+                textInvoiceReceipt.text = avm.invoiceInReceipt(tableInput, true)
+                textTableReceipt.text = avm.tableInReceipt(tableInput)
+                textTotalReceipt.text = avm.totalInReceipt(tableInput)
 
                 // set recycler
-                val source = vm.getDetailOrders(tableInput)
+                val source = avm.getDetailOrders(tableInput)
                 val presenter = Presenter.simple(
                         requireContext(), R.layout.item_receipt, 0
                 ) { view, item: String -> (view as AppCompatTextView).text = item }
@@ -111,15 +108,14 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
                 Adapter.builder(viewLifecycleOwner)
                         .addSource(Source.fromList(source))
                         .addPresenter(presenter)
-                        .into(rvItems)
+                        .into(rvItemsReceipt)
 
                 // set dialog btn
                 negativeButton(text = "Back")
                 positiveButton(text = "Print") {
                     createPrintDialog(
-                            "${invoiceText.text}",
-                            "${tableText.text}",
-                            "${totalText.text}",
+                            "${textInvoiceReceipt.text}",
+                            "${textTotalReceipt.text}",
                             source
                     )
                 }
@@ -127,9 +123,7 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
         }
     }
 
-    private fun createPrintDialog(
-            invoice: String, table: String, total: String, items: List<String>
-    ) {
+    private fun createPrintDialog(invoice: String, total: String, items: List<String>) {
         val printers = avm.getPrinters()
         val list = printers.map { "${it.name} - ${it.address}" }
 
@@ -141,7 +135,7 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
             positiveButton(text = "Print")
             listItemsSingleChoice(items = list) { _, _, text ->
                 val printer = text.split(" - ")[1]
-                fu.print(printer, invoice, table, total, items)
+                fu.print(printer, invoice, total, items)
             }
             if (list.isEmpty()) {
                 message(text = getString(R.string.msg_list_empty))

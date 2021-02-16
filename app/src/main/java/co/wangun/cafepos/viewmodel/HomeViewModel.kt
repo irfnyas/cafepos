@@ -40,16 +40,12 @@ class HomeViewModel: ViewModel() {
         su.set(TablesAmount_INT, input.toString().toInt())
     }
 
-    fun getTodayDate(): String {
-        return SimpleDateFormat("dd MMM yyyy", Locale.ROOT).format(Date())
-    }
-
     fun getTodayDateDb(): String {
         return SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
     }
 
     fun getTime(): String {
-        return SimpleDateFormat("HH:mm", Locale.ROOT).format(Date())
+        return SimpleDateFormat("HH:mm:ss", Locale.ROOT).format(Date())
     }
 
     fun getNick(): String {
@@ -83,12 +79,16 @@ class HomeViewModel: ViewModel() {
     fun putPrinter(name: String, address: String) {
         val printer = db.printerQueries.find(name).executeAsOneOrNull()
         val id = printer?.id ?: getNewPrinterId()
-        val newPrinter = Printer(id, name.toUpperCase(Locale.ROOT), address)
+        val newPrinter = Printer(id, name, address)
         db.printerQueries.insert(newPrinter)
     }
 
     fun delPrinter(id: Long?) {
         id?.let { db.printerQueries.delete(it) }
+    }
+
+    fun isPrinterListed(name: String): Boolean {
+        return db.printerQueries.find(name).executeAsOneOrNull() != null
     }
 
     fun logout() {

@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS active_order (
     num INTEGER,
     date TEXT,
     time TEXT,
-    creator TEXT
+    creator TEXT,
+    payment TEXT
 );
 
 insert:
