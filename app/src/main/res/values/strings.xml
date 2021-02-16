@@ -7,4 +7,5 @@
     <string name="pass_new_invalid">Incorrect new password. Please check your input.</string>
     <string name="pass_old_invalid">Incorrect password. Please check your input.</string>
     <string name="msg_list_empty">This list is empty. Please add a new one first.</string>
+    <string name="msg_save_warning">It is not recommended to save this order without printing the receipt.</string>
 </resources>

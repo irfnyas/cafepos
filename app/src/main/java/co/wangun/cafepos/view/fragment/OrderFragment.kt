@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.viewbinding.library.fragment.viewBinding
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
@@ -94,7 +96,9 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
     }
 
     private fun setRecycler() {
-        val source = vm.ordersTemp
+        // init val
+        val list = vm.ordersTemp
+        val source = Source.fromList(list)
         val presenter = Presenter.simple(requireContext(), R.layout.item_order, 0)
         { view, item: Active_order ->
             view.apply {
@@ -118,7 +122,7 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
                 // set view
                 nameText.text = item.name
                 amountText.text = "${item.amount}"
-                if (item.note.isNullOrBlank()) noteText.visibility = View.GONE
+                if (item.note.isNullOrBlank()) noteText.visibility = GONE
                 else noteText.text = item.note
                 putPriceRecycler()
 
@@ -150,9 +154,12 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
 
         // build adapter
         Adapter.builder(viewLifecycleOwner)
-                .addSource(Source.fromList(source))
+                .addSource(source)
                 .addPresenter(presenter)
                 .into(bind.rvOrders)
+
+        // if list empty
+        bind.layEmpty.root.visibility = if(list.isEmpty()) VISIBLE else GONE
     }
 
     // dialog
@@ -284,7 +291,7 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
                 lifecycleOwner(viewLifecycleOwner)
                 cornerRadius(24f)
                 title(text = "Save Order?")
-                message(text = "It is not recommended to save this order without printing the receipt.")
+                message(text = getString(R.string.msg_save_warning))
                 negativeButton(text = "Don't Save") { backToHome() }
                 positiveButton(text = "Save") { postOrder(null) }
                 neutralButton(text = "Back")

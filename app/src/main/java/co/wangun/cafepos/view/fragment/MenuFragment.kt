@@ -6,6 +6,8 @@ import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.viewbinding.library.fragment.viewBinding
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
@@ -61,25 +63,34 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
     }
 
     private fun initRecycler() {
-        Adapter.builder(viewLifecycleOwner)
-                .addSource(Source.fromList(vm.getAllMenu()))
-                .addPresenter(Presenter.simple(requireContext(), R.layout.item_menu, 0)
-                { view, item: Menu ->
-                    view.apply {
-                        // init view
-                        val viewName = findViewById<AppCompatTextView>(R.id.text_name_menu)
-                        val viewDesc = findViewById<AppCompatTextView>(R.id.text_desc_menu)
-                        val viewPrice = findViewById<AppCompatTextView>(R.id.text_price_menu)
-                        val viewEdit = findViewById<FloatingActionButton>(R.id.btn_edit_menu)
+        // init val
+        val list = vm.getAllMenu()
+        val source = Source.fromList(list)
+        val presenter = Presenter.simple(requireContext(), R.layout.item_menu, 0)
+        { view, item: Menu ->
+            view.apply {
+                // init view
+                val viewName = findViewById<AppCompatTextView>(R.id.text_name_menu)
+                val viewDesc = findViewById<AppCompatTextView>(R.id.text_desc_menu)
+                val viewPrice = findViewById<AppCompatTextView>(R.id.text_price_menu)
+                val viewEdit = findViewById<FloatingActionButton>(R.id.btn_edit_menu)
 
-                        // set view
-                        viewName.text = item.name
-                        viewDesc.text = "(${item.category}) ${item.desc}"
-                        viewPrice.text = avm.withCurrency(item.price ?: 0.0)
-                        viewEdit.setOnClickListener { createMenuDialog(item) }
-                    }
-                })
+                // set view
+                viewName.text = item.name
+                viewDesc.text = "(${item.category}) ${item.desc}"
+                viewPrice.text = avm.withCurrency(item.price ?: 0.0)
+                viewEdit.setOnClickListener { createMenuDialog(item) }
+            }
+        }
+
+        // build adapter
+        Adapter.builder(viewLifecycleOwner)
+                .addSource(source)
+                .addPresenter(presenter)
                 .into(bind.rvMenus)
+
+        // if list empty
+        bind.layEmpty.root.visibility = if (list.isEmpty()) VISIBLE else GONE
     }
 
     // dialog

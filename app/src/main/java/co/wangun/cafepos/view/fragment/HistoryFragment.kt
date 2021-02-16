@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.viewbinding.library.fragment.viewBinding
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
@@ -51,7 +53,8 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
     }
 
     private fun initRecycler() {
-        val source = vm.getAllOrders()
+        val list = vm.getAllOrders()
+        val source = Source.fromList(list)
         val presenter = Presenter.simple(requireContext(), R.layout.item_history, 0)
         { view, item: String ->
             // init val
@@ -75,10 +78,14 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
             detailBtn.setOnClickListener { createDetailDialog(item) }
         }
 
+        // build adapter
         Adapter.builder(viewLifecycleOwner)
-                .addSource(Source.fromList(source))
+                .addSource(source)
                 .addPresenter(presenter)
                 .into(bind.rvHistories)
+
+        // if list empty
+        bind.layEmpty.root.visibility = if(list.isEmpty()) VISIBLE else GONE
     }
 
     private fun createDetailDialog(tableInput: String) {
