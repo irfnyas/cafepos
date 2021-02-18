@@ -93,10 +93,6 @@ class MainViewModel: ViewModel() {
         return db.printerQueries.selectAll().executeAsList().sortedBy { it.name }
     }
 
-    fun getTodayDate(): String {
-        return SimpleDateFormat("dd MMM yyyy", Locale.ROOT).format(Date())
-    }
-
     fun getDetailOrders(tableInput: String): List<String> {
         val itemSplit = tableInput.split("?")
         val num = itemSplit[0].toLong()

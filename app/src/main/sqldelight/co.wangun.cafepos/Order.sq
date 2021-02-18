@@ -20,6 +20,13 @@ SELECT * FROM active_order;
 selectAllDistinct:
 SELECT DISTINCT num, date, time FROM active_order;
 
+selectDistinctRange:
+SELECT DISTINCT num, date, time FROM active_order WHERE date BETWEEN ? AND ? ;
+
+
+selectDistinctThisMonth:
+SELECT DISTINCT num, date, time FROM active_order WHERE date BETWEEN date('now', 'start of month') AND date('now');
+
 selectAllTodayForTable:
 SELECT DISTINCT time FROM active_order WHERE num = ? AND date = ?;
 

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import co.wangun.cafepos.db.DbClient.sqlDriver
 import co.wangun.cafepos.util.CryptUtils
+import co.wangun.cafepos.util.DateUtils
 import co.wangun.cafepos.util.FunUtils
 import co.wangun.cafepos.util.SessionUtils
 import co.wangun.cafepos.view.MainActivity
@@ -38,6 +39,7 @@ class App: Application() {
         var isDebug by Delegates.notNull<Boolean>()
         val db by lazy { Database(sqlDriver) }
         val cu by lazy { CryptUtils() }
+        val du by lazy { DateUtils() }
         val fu by lazy { FunUtils() }
         val su by lazy { SessionUtils() }
     }

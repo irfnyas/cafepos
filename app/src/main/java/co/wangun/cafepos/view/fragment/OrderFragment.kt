@@ -16,6 +16,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import co.wangun.cafepos.App.Companion.du
 import co.wangun.cafepos.App.Companion.fu
 import co.wangun.cafepos.App.Companion.su
 import co.wangun.cafepos.R
@@ -79,7 +80,7 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
     //
     private fun setTitle() {
         bind.textTitleOrder.text =
-                "Table ${args.tableOrder} - ${avm.getTodayDate()} - ${args.timeOrder}"
+                "Table ${args.tableOrder} - ${du.getTodayDate()} - ${args.timeOrder}"
     }
 
     private fun setInvoice() {

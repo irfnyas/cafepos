@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import co.wangun.cafepos.App.Companion.du
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.DialogPrinterBinding
 import co.wangun.cafepos.databinding.FragmentHomeBinding
@@ -21,11 +22,9 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.getInputLayout
 import com.afollestad.materialdialogs.input.input
-import com.afollestad.materialdialogs.internal.main.DialogLayout
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.afollestad.materialdialogs.list.listItems
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.otaliastudios.elements.Adapter
 import com.otaliastudios.elements.Presenter
@@ -238,13 +237,13 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         MaterialDialog(requireContext()).show {
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
-            title(text = "Table $num (${avm.getTodayDate()})")
+            title(text = "Table $num (${du.getTodayDate()})")
             negativeButton(text = "Back")
             positiveButton(text = "New Order") {
-                navToOrderFragment(num, vm.getTime(), vm.getTodayDateDb())
+                navToOrderFragment(num, du.getTime(), du.getTodayDateYmd())
             }
             listItems(items = list, waitForPositiveButton = false) { _, _, text ->
-                navToOrderFragment(num, vm.parseTime("$text"), vm.getTodayDateDb())
+                navToOrderFragment(num, du.parseTime("$text"), du.getTodayDateYmd())
             }
             if (list.isEmpty()) {
                 message(text = getString(R.string.msg_list_empty))

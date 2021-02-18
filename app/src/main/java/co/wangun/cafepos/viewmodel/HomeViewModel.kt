@@ -3,6 +3,7 @@ package co.wangun.cafepos.viewmodel
 import androidx.lifecycle.ViewModel
 import co.wangun.cafepos.App.Companion.cu
 import co.wangun.cafepos.App.Companion.db
+import co.wangun.cafepos.App.Companion.du
 import co.wangun.cafepos.App.Companion.su
 import co.wangun.cafepos.util.SessionUtils.Companion.LoggedInUserNick_STR
 import co.wangun.cafepos.util.SessionUtils.Companion.LoggedInUser_STR
@@ -19,7 +20,7 @@ class HomeViewModel: ViewModel() {
 
     fun getTodayOrderForTable(num: Int): List<String> {
         return db.orderQueries
-                .selectAllTodayForTable(num.toLong(), getTodayDateDb())
+                .selectAllTodayForTable(num.toLong(), du.getTodayDateYmd())
                 .executeAsList().mapIndexed { i, item ->
                     "Order ${ i + 1 } - Created at ${item.time}"
                 }
@@ -32,20 +33,8 @@ class HomeViewModel: ViewModel() {
         } else amount
     }
 
-    fun parseTime(text: String): String {
-        return text.split(" ").last()
-    }
-
     fun putTablesAmount(input: Int) {
         su.set(TablesAmount_INT, input.toString().toInt())
-    }
-
-    fun getTodayDateDb(): String {
-        return SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
-    }
-
-    fun getTime(): String {
-        return SimpleDateFormat("HH:mm:ss", Locale.ROOT).format(Date())
     }
 
     fun getNick(): String {
