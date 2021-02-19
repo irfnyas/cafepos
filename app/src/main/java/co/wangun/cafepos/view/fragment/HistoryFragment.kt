@@ -2,7 +2,8 @@ package co.wangun.cafepos.view.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
+import android.text.InputType
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -13,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
 import co.wangun.cafepos.App.Companion.du
 import co.wangun.cafepos.App.Companion.fu
 import co.wangun.cafepos.R
@@ -21,12 +21,11 @@ import co.wangun.cafepos.databinding.DialogReceiptBinding
 import co.wangun.cafepos.databinding.FragmentHistoryBinding
 import co.wangun.cafepos.viewmodel.HistoryViewModel
 import co.wangun.cafepos.viewmodel.MainViewModel
-import com.afollestad.date.dayOfMonth
-import com.afollestad.date.month
-import com.afollestad.date.year
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.datetime.datePicker
+import com.afollestad.materialdialogs.input.getInputField
+import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -59,6 +58,7 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
         bind.apply {
             btnBack.setOnClickListener { findNavController().popBackStack() }
             btnDateRange.setOnClickListener { createStartDateDialog() }
+            btnInvoice.setOnClickListener { createInvoiceDialog() }
         }
     }
 
@@ -68,6 +68,7 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
     }
 
     private fun initDateRange() {
+        bind.btnInvoice.text = "All Transactions"
         bind.btnDateRange.text = vm.getDefaultDateRange()
     }
 
@@ -203,6 +204,45 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
         }
     }
 
+    private fun createInvoiceDialog() {
+        // init val
+        val isAlreadyFiltered = bind.btnInvoice.text.contains("#")
+        val preFill = if(isAlreadyFiltered) bind.btnInvoice.text.drop(1) else ""
+
+        // build dialog
+        MaterialDialog(requireContext()).show {
+            lifecycleOwner(viewLifecycleOwner)
+            title(text = "Customer Number Filter")
+            cornerRadius(24f)
+            cancelable(false)
+
+            // input
+            input(
+                    hint = "Input the invoice without #...",
+                    inputType = InputType.TYPE_CLASS_NUMBER,
+                    prefill = preFill
+            ) { _, input -> filterByInvoice("$input") }
+
+            // input field style
+            getInputField().apply {
+                gravity = Gravity.CENTER
+                post { selectAll() }
+                setBackgroundColor(resources.getColor(
+                        android.R.color.transparent, null
+                ))
+            }
+
+            // neutral btn
+            negativeButton(text = "Back")
+            positiveButton(text = "Confirm")
+            if(isAlreadyFiltered) {
+                neutralButton(text = "Remove") {
+                    filterByInvoice("")
+                }
+            }
+        }
+    }
+
     // etc
     //
     private fun filterToday() {
@@ -227,5 +267,13 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
         if(endStr == now) endStr = "Today"
         val btnText = if (startStr == endStr) startStr else "$startStr until $endStr"
         bind.btnDateRange.text = btnText
+    }
+
+    private fun filterByInvoice(input: String) {
+        if(input.isNotBlank()) {
+            initRecycler(vm.getOrderByInvoice(input))
+            bind.btnInvoice.text = "#$input"
+            bind.btnDateRange.text = "Not filtered by date"
+        } else initView()
     }
 }
