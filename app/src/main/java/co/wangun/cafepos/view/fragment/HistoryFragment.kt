@@ -63,7 +63,7 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
     }
 
     private fun initView() {
-        initRecycler(vm.getThisMonthOrders())
+        initRecycler(vm.getTodayOrders())
         initDateRange()
     }
 

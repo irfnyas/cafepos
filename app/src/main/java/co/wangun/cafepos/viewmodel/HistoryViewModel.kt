@@ -19,6 +19,15 @@ class HistoryViewModel: ViewModel() {
                 .map { "${it.num}?${it.date}?${it.time}" }
     }
 
+    fun getTodayOrders(): List<String> {
+        return db.orderQueries
+                .selectDistinctToday()
+                .executeAsList()
+                .sortedWith(compareBy ({ it.date }, { it.time }))
+                .reversed()
+                .map { "${it.num}?${it.date}?${it.time}" }
+    }
+
     fun getThisMonthOrders(): List<String> {
         return db.orderQueries
                 .selectDistinctThisMonth()
@@ -71,8 +80,6 @@ class HistoryViewModel: ViewModel() {
     }
 
     fun getDefaultDateRange(): String {
-        val today = du.getTodayDmy()
-        val firstOfMonth = today.replaceBefore("-","01")
-        return "$firstOfMonth until Today"
+        return "Today"
     }
 }
