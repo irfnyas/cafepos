@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import co.wangun.cafepos.App.Companion.db
 import co.wangun.cafepos.App.Companion.du
 import co.wangun.cafepos.App.Companion.fu
 import co.wangun.cafepos.R
@@ -65,11 +66,15 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
     private fun initView() {
         initRecycler(vm.getTodayOrders())
         initDateRange()
+        initInvoice()
     }
 
     private fun initDateRange() {
-        bind.btnInvoice.text = "All Transactions"
         bind.btnDateRange.text = vm.getDefaultDateRange()
+    }
+
+    private fun initInvoice() {
+        bind.btnInvoice.text = "All Transactions"
     }
 
     private fun initRecycler(list: List<String>) {
@@ -184,8 +189,12 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
                     dismiss()
                 }
             }
-            negativeButton(text = "Back") { dismiss() }
             positiveButton(text = "Confirm")
+            negativeButton(text = "Back") { dismiss() }
+
+            // show filter today if not filtered by today
+            if(bind.btnDateRange.text.contains("-"))
+            neutralButton(text = "Select Today") { filterToday(); dismiss() }
         }
     }
 
@@ -252,6 +261,9 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
 
         // update btn text
         bind.btnDateRange.text = "Today"
+
+        // remove filter invoice
+        initInvoice()
     }
 
     private fun filterDate(startCal: Calendar, endCal: Calendar) {
@@ -267,6 +279,9 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
         if(endStr == now) endStr = "Today"
         val btnText = if (startStr == endStr) startStr else "$startStr until $endStr"
         bind.btnDateRange.text = btnText
+
+        // remove filter invoice
+        initInvoice()
     }
 
     private fun filterByInvoice(input: String) {

@@ -1,8 +1,6 @@
 package co.wangun.cafepos.view.fragment
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +11,6 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.DialogMenuBinding
@@ -25,17 +22,13 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
+import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.otaliastudios.elements.Adapter
 import com.otaliastudios.elements.Presenter
 import com.otaliastudios.elements.Source
 import cowanguncafepos.Menu
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.*
 
-@SuppressLint("SetTextI18n")
 class MenuFragment: Fragment(R.layout.fragment_menu) {
 
     private val TAG: String by lazy { javaClass.simpleName }
@@ -52,19 +45,34 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
     //
     private fun initFun() {
         initBtn()
-        initRecycler()
+        initView()
+    }
+
+    private fun initView() {
+        initRecycler(vm.getAllMenu())
+        initNameFilter()
+        initCatsFilter()
+    }
+
+    private fun initNameFilter() {
+        bind.btnFind.text = "All Menus"
+    }
+
+    private fun initCatsFilter() {
+        bind.btnCats.text = "All Categories"
     }
 
     private fun initBtn() {
         bind.apply {
             btnBack.setOnClickListener { findNavController().popBackStack() }
-            btnNewMenu.setOnClickListener { createMenuDialog(null) }
+            btnNew.setOnClickListener { createMenuDialog(null) }
+            btnFind.setOnClickListener { createFindDialog() }
+            btnCats.setOnClickListener { createCatsDialog() }
         }
     }
 
-    private fun initRecycler() {
+    private fun initRecycler(list: List<Menu>) {
         // init val
-        val list = vm.getAllMenu()
         val source = Source.fromList(list)
         val presenter = Presenter.simple(requireContext(), R.layout.item_menu, 0)
         { view, item: Menu ->
@@ -95,7 +103,7 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
 
     // dialog
     //
-    private fun createCategoryDialog(binding: DialogMenuBinding, categories: List<String>) {
+    private fun createNewCatDialog(binding: DialogMenuBinding, categories: List<String>) {
         binding.apply {
             fun putCategories(input: String) {
                 spinnerCategories.apply {
@@ -148,18 +156,18 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
                     neutralButton(text = "Remove") {
                         vm.deleteMenu(menu.id)
                         dismiss()
-                        initRecycler()
+                        initView()
                     }
                 }
                 negativeButton(text = "Back") { dismiss() }
-                positiveButton(text = "Confirm") { confirmMenu(binding, menu, it) }
+                positiveButton(text = "Confirm") { confirmMenu(binding, menu, it, isNew) }
 
                 // view dialog
                 editNameMenu.setText(menu?.name)
                 editDescMenu.setText(menu?.desc)
                 editPriceMenu.setText("${menu?.price ?: 0.0}")
                 btnNewCategory.setOnClickListener {
-                    createCategoryDialog(binding, categories)
+                    createNewCatDialog(binding, categories)
                 }
                 spinnerCategories.apply {
                     lifecycleOwner = viewLifecycleOwner
@@ -173,9 +181,79 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
         }
     }
 
+    private fun createFindDialog() {
+        // init val
+        val isAlreadyFiltered = vm.nameFilter.value.isNotBlank()
+        val preFill = if(isAlreadyFiltered) vm.nameFilter.value else ""
+
+        // build dialog
+        MaterialDialog(requireContext()).show {
+            lifecycleOwner(viewLifecycleOwner)
+            title(text = "Name Filter")
+            cornerRadius(24f)
+            cancelable(false)
+
+            // input
+            input(hint = "Input the name...", prefill = preFill) {
+                _, input -> filterByName("$input")
+            }
+
+            // input field style
+            getInputField().apply {
+                gravity = Gravity.CENTER
+                post { selectAll() }
+                setBackgroundColor(resources.getColor(
+                        android.R.color.transparent, null
+                ))
+            }
+
+            // neutral btn
+            negativeButton(text = "Back")
+            positiveButton(text = "Confirm")
+            if(isAlreadyFiltered) {
+                neutralButton(text = "Remove") {
+                    filterByName("")
+                }
+            }
+        }
+    }
+
+    private fun createCatsDialog() {
+        // init val
+        val cats = vm.getAllCategories()
+        val indices = vm.getCatsFilterIndices()
+
+        // create dialog
+        MaterialDialog(requireContext()).show {
+            // dialog general
+            lifecycleOwner(viewLifecycleOwner)
+            cornerRadius(24f)
+            title(text = "Categories Filter")
+            message(text = "The menus that are within this selected categories will be displayed")
+
+            // dialog list
+            listItemsMultiChoice(
+                    items = cats,
+                    initialSelection = indices
+            ) { _, _, list -> filterByCats(list) }
+
+            // dialog btn
+            negativeButton(text = "Back")
+            positiveButton(text = "Confirm")
+            if(vm.hasCatsFilter()) {
+                neutralButton(text = "Remove") {
+                    filterByCats(vm.getAllCategories())
+                }
+            }
+        }
+    }
+
     // etc
     //
-    private fun confirmMenu(binding: DialogMenuBinding, menu: Menu?, dialog: MaterialDialog) {
+    private fun confirmMenu(
+            binding: DialogMenuBinding, menu: Menu?,
+            dialog: MaterialDialog, isNew: Boolean
+    ) {
         binding.apply {
             val newMenu = Menu(
                     menu?.id ?: vm.countMenu(),
@@ -185,15 +263,15 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
                     "${editPriceMenu.text}".toDouble()
             )
 
-            if (isMenuFormValid(binding)) {
+            if (isMenuFormValid(binding, isNew)) {
                 vm.postMenu(newMenu)
                 dialog.dismiss()
-                initRecycler()
+                initRecycler(vm.getLastMenus())
             }
         }
     }
 
-    private fun isMenuFormValid(binding: DialogMenuBinding): Boolean {
+    private fun isMenuFormValid(binding: DialogMenuBinding, isNew: Boolean): Boolean {
         binding.apply {
             var err = 0
 
@@ -201,7 +279,7 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
                 editNameMenu.text.isNullOrBlank() -> {
                     err++; getString(R.string.edit_empty)
                 }
-                vm.isMenuListed("${editNameMenu.text}") -> {
+                isNew && vm.isMenuListed("${editNameMenu.text}") -> {
                     err++; getString(R.string.edit_duplicated)
                 }
                 else -> null
@@ -213,5 +291,34 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
 
             return err == 0
         }
+    }
+
+    private fun filterByName(input: String) {
+        // set view
+        if(input.isNotBlank()) bind.btnFind.text = "\"$input\""
+        else initNameFilter()
+
+        // set filter
+        vm.setNameFilter(input)
+
+        // refresh list
+        initRecycler(vm.getLastMenus())
+    }
+
+    private fun filterByCats(list: List<CharSequence>) {
+        // set filter
+        vm.setCatsFilter(list)
+
+        // set view
+        if(list.isNotEmpty() && vm.hasCatsFilter()) {
+            bind.btnCats.text = when (list.size) {
+                1 -> "${list[0]}"
+                2 -> "${list[0]} and ${list[1]}"
+                else -> "${list[0]}, ${list[1]},\nand ${list.size - 2} others"
+            }
+        } else initCatsFilter()
+
+        // refresh list
+        initRecycler(vm.getLastMenus())
     }
 }
