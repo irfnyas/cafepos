@@ -316,7 +316,7 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
             bind.btnCats.text = when (list.size) {
                 1 -> "${list[0]}"
                 2 -> "${list[0]} and ${list[1]}"
-                else -> "${list[0]}, ${list[1]},\nand ${list.size - 2} others"
+                else -> "${list[0]} and ${list.size - 1} others"
             }
         } else initCatsFilter()
 
