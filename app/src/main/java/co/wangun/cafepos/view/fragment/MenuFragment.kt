@@ -1,5 +1,6 @@
 package co.wangun.cafepos.view.fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -29,6 +30,7 @@ import com.otaliastudios.elements.Presenter
 import com.otaliastudios.elements.Source
 import cowanguncafepos.Menu
 
+@SuppressLint("SetTextI18n")
 class MenuFragment: Fragment(R.layout.fragment_menu) {
 
     private val TAG: String by lazy { javaClass.simpleName }
@@ -294,12 +296,12 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
     }
 
     private fun filterByName(input: String) {
+        // set filter
+        vm.setNameFilter(input)
+
         // set view
         if(input.isNotBlank()) bind.btnFind.text = "\"$input\""
         else initNameFilter()
-
-        // set filter
-        vm.setNameFilter(input)
 
         // refresh list
         initRecycler(vm.getLastMenus())

@@ -1,5 +1,6 @@
 package co.wangun.cafepos.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import co.wangun.cafepos.App.Companion.db
 import cowanguncafepos.Menu
@@ -56,14 +57,13 @@ class MenuViewModel: ViewModel() {
         val isFilteredByCats = catsFilter.isNotEmpty()
 
         // set name filter
-        if(isFilteredByName) list.filter {
-            it.name.contains(nameFilter.value, true)
+        if(isFilteredByName) list.retainAll {
+           it.name.contains(nameFilter.value, true)
         }
 
         // set cats filter
-        val listTemp = list.toList()
-        if(isFilteredByCats) listTemp.forEach {
-            if(!catsFilter.contains(it.category)) list.remove(it)
+        if(isFilteredByCats) list.retainAll {
+            catsFilter.contains(it.category)
         }
 
         // return list
