@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.fragment.MenuFragment">
+    tools:context=".view.fragment.PaymentFragment">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/lay_top"
@@ -15,100 +15,100 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_back"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            app:iconTint="@color/grey_900"
-            app:icon="@drawable/ic_baseline_arrow_back_24"/>
+            app:icon="@drawable/ic_baseline_arrow_back_24"
+            app:iconTint="@color/grey_900"/>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_title"
             style="@style/TextAppearance.MaterialComponents.Headline6"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="Edit Menu"/>
+            android:text="Edit Payment"/>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_menus"
+        android:id="@+id/rv_main"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:padding="16dp"
-        android:scrollbars="horizontal"
         android:clipToPadding="false"
+        android:padding="16dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/separator_vertical"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/separator_vertical"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/lay_top"
-        app:spanCount="3"/>
+        app:spanCount="3" />
 
     <include
-        layout="@layout/layout_empty"
         android:id="@+id/lay_empty"
+        layout="@layout/layout_empty"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintVertical_bias="0.40"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/separator_vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lay_top"/>
+        app:layout_constraintEnd_toEndOf="@id/separator_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lay_top"
+        app:layout_constraintVertical_bias="0.40"/>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="vertical"
         android:padding="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lay_top"
-        app:layout_constraintStart_toStartOf="@id/separator_vertical">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/separator_vertical"
+        app:layout_constraintTop_toBottomOf="@id/lay_top">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_new"
+            style="@style/Theme.FilledButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="New Menu"
-            style="@style/Theme.FilledButton"
             android:layout_marginVertical="4dp"
+            android:text="New Payment"
             app:icon="@drawable/ic_baseline_add_24"/>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_find"
+            android:id="@+id/btn_currency"
+            style="@style/Theme.FilledButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="All Menus"
-            style="@style/Theme.FilledButton"
             android:layout_marginVertical="4dp"
-            app:icon="@drawable/ic_baseline_find_in_page_24"/>
+            android:text="Edit Currency"
+            app:icon="@drawable/ic_baseline_attach_money_24"/>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_cats"
+            android:id="@+id/btn_find"
+            style="@style/Theme.FilledButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="All Categories"
-            style="@style/Theme.FilledButton"
             android:layout_marginVertical="4dp"
-            app:icon="@drawable/ic_baseline_flatware_24"/>
+            android:text="All Payments"
+            app:icon="@drawable/ic_baseline_search_24"/>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        app:layout_constraintTop_toBottomOf="@id/lay_top"
+        android:alpha="0.1"
         android:background="@color/black"
-        android:alpha="0.1"/>
+        app:layout_constraintTop_toBottomOf="@id/lay_top"/>
 
     <View
         android:id="@+id/separator_vertical"
         android:layout_width="2dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/lay_top"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:background="@color/black"
         android:alpha="0.1"
-        app:layout_constraintHorizontal_bias="0.75"/>
+        android:background="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.75"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lay_top"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

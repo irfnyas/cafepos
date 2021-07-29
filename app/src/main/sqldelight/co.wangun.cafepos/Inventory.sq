@@ -1,0 +1,35 @@
+CREATE TABLE IF NOT EXISTS inventory (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    desc TEXT,
+    mass REAL,
+    price REAL,
+    datetime TEXT
+);
+
+insert:
+INSERT OR REPLACE INTO inventory VALUES ?;
+
+selectAll:
+SELECT *, category, unit FROM inventory INNER JOIN material
+ON inventory.name = material.name ORDER BY datetime DESC, category, inventory.name;
+
+selectAllPositive:
+SELECT *, category, unit FROM inventory INNER JOIN material ON inventory.name = material.name
+WHERE inventory.mass > 0 ORDER BY datetime DESC, category, inventory.name;
+
+selectAllNegative:
+SELECT *, category, unit FROM inventory INNER JOIN material ON inventory.name = material.name
+WHERE inventory.mass < 0 ORDER BY datetime DESC, category, inventory.name;
+
+delete:
+DELETE FROM inventory WHERE id = ?;
+
+deleteAll:
+DELETE FROM inventory;
+
+count:
+SELECT COUNT (*) FROM inventory;
+
+lastId:
+SELECT max(id) FROM inventory;

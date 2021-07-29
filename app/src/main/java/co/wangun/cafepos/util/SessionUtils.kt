@@ -52,6 +52,7 @@ class SessionUtils {
         const val LoggedInUser_STR = "LoggedInUser_STR"
         const val LoggedInUserNick_STR = "LoggedInUserNick_STR"
         const val TablesAmount_INT = "TablesAmount_INT"
+        const val Currency_STR = "Currency_STR"
         const val TablesSpansCount_INT = "TablesSpansCount_INT"
     }
 }

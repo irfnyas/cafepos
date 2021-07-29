@@ -1,11 +1,20 @@
 <resources>
     <string name="app_name">Cafe POS</string>
-    <string name="currency">£</string>
+    <string name="currency">IDR</string>
+    <string name="autofill_empty">Please type a new value</string>
+    <string name="edit_once">This value can not be changed later</string>
+    <string name="edit_chose">Choose material from dropdown</string>
     <string name="edit_empty">Field must not be empty</string>
+    <string name="edit_invalid">You can not input this value</string>
+    <string name="edit_not_exist">This item might not exist</string>
     <string name="edit_duplicated">This item is already on the list</string>
+    <string name="edit_limited">This item can not hold this value</string>
     <string name="login_invalid">Credential not found. Please check your username or password.</string>
     <string name="pass_new_invalid">Incorrect new password. Please check your input.</string>
     <string name="pass_old_invalid">Incorrect password. Please check your input.</string>
-    <string name="msg_list_empty">This list is empty. Please add a new one first.</string>
+    <string name="msg_list_empty">This list is empty, please add a new one first.</string>
     <string name="msg_save_warning">It is not recommended to save this order without printing the receipt.</string>
+    <string name="msg_material_empty">You have no material, please add a new one first from the \'Edit Material\' sections.</string>
+    <string name="msg_product_empty">You have no product, please add a new one first from the \'Edit Product\' sections.</string>
+    <string name="msg_categories">The products that are within this selected categories will be displayed</string>
 </resources>

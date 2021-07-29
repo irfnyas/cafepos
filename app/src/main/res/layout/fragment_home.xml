@@ -40,11 +40,10 @@
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_tables"
+        android:id="@+id/rv_main"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="16dp"
-        android:scrollbars="horizontal"
         android:clipToPadding="false"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_constraintStart_toStartOf="parent"
@@ -70,13 +69,49 @@
             android:orientation="vertical">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_edit_menu"
+                android:id="@+id/btn_edit_tables"
+                style="@style/Theme.FilledButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Edit Menu"
+                android:layout_marginVertical="4dp"
+                android:text="Edit Tables"
+                app:icon="@drawable/ic_baseline_groups_24"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_edit_product"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Edit Product"
                 style="@style/Theme.FilledButton"
                 app:icon="@drawable/ic_baseline_restaurant_menu_24"
                 android:layout_marginVertical="4dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_edit_material"
+                style="@style/Theme.FilledButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="4dp"
+                android:text="Edit Material"
+                app:icon="@drawable/ic_baseline_food_bank_24" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_edit_inventory"
+                style="@style/Theme.FilledButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="4dp"
+                android:text="Edit Inventory"
+                app:icon="@drawable/ic_baseline_inventory_24" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_edit_payment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Edit Payment"
+                style="@style/Theme.FilledButton"
+                android:layout_marginVertical="4dp"
+                app:icon="@drawable/ic_baseline_payment_24" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_edit_printer"
@@ -86,15 +121,6 @@
                 style="@style/Theme.FilledButton"
                 android:layout_marginVertical="4dp"
                 app:icon="@drawable/ic_baseline_print_24" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_edit_tables"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Edit Tables"
-                style="@style/Theme.FilledButton"
-                android:layout_marginVertical="4dp"
-                app:icon="@drawable/ic_baseline_groups_24"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_order_history"

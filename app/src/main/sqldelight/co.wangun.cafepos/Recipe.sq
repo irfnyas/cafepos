@@ -1,0 +1,40 @@
+CREATE TABLE IF NOT EXISTS recipe (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name TEXT,
+    mass REAL,
+    unit TEXT,
+    parent TEXT
+);
+
+insert:
+INSERT OR REPLACE INTO recipe VALUES ?;
+
+selectAll:
+SELECT * FROM recipe ORDER BY parent, name;
+
+selectAllNames:
+SELECT DISTINCT name FROM recipe ORDER BY name;
+
+selectAllParents:
+SELECT DISTINCT parent FROM recipe ORDER BY parent;
+
+findAllParentRecipes:
+SELECT * FROM recipe WHERE parent = ? ORDER BY name;
+
+findAllNameRecipes:
+SELECT * FROM recipe WHERE name = ? ORDER BY parent;
+
+find:
+SELECT * FROM recipe WHERE parent = ? AND name = ?;
+
+delete:
+DELETE FROM recipe WHERE id = ?;
+
+deleteAll:
+DELETE FROM recipe;
+
+count:
+SELECT COUNT (*) FROM recipe;
+
+lastId:
+SELECT max(id) FROM recipe;

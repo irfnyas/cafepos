@@ -1,0 +1,42 @@
+CREATE TABLE IF NOT EXISTS material (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name TEXT UNIQUE NOT NULL,
+    desc TEXT,
+    category TEXT,
+    unit TEXT,
+    mass REAL,
+    is_raw INTEGER
+);
+
+insert:
+INSERT OR REPLACE INTO material VALUES ?;
+
+selectAll:
+SELECT * FROM material ORDER BY category, name;
+
+selectAllRawMaterials:
+SELECT * FROM material WHERE is_raw = 1 ORDER BY category, name;
+
+selectAllRefinedMaterials:
+SELECT * FROM material WHERE is_raw = 0 ORDER BY category, name;
+
+selectAllCategories:
+SELECT DISTINCT category FROM material ORDER BY category;
+
+selectAllUnits:
+SELECT DISTINCT unit FROM material ORDER BY unit;
+
+find:
+SELECT * FROM material WHERE name = ?;
+
+delete:
+DELETE FROM material WHERE id = ?;
+
+deleteAll:
+DELETE FROM material;
+
+count:
+SELECT COUNT (*) FROM material;
+
+lastId:
+SELECT max(id) FROM material;

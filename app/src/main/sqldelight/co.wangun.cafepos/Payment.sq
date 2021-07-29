@@ -1,0 +1,27 @@
+CREATE TABLE IF NOT EXISTS payment (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name TEXT UNIQUE NOT NULL,
+    desc TEXT,
+    image TEXT
+);
+
+insert:
+INSERT OR REPLACE INTO payment VALUES ?;
+
+find:
+SELECT * FROM payment WHERE name = ?;
+
+selectAll:
+SELECT * FROM payment ORDER BY name;
+
+delete:
+DELETE FROM payment WHERE id = ?;
+
+deleteAll:
+DELETE FROM payment;
+
+count:
+SELECT COUNT (*) FROM payment;
+
+lastId:
+SELECT max(id) FROM payment;

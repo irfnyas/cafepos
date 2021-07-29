@@ -23,3 +23,6 @@ DELETE FROM user;
 
 count:
 SELECT COUNT (*) FROM user;
+
+lastId:
+SELECT max(id) FROM user;

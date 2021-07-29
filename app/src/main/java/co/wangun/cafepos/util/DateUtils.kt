@@ -5,14 +5,19 @@ import com.afollestad.date.month
 import com.afollestad.date.year
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.Locale.ROOT
 
 class DateUtils {
-    fun getTodayDateYmd(): String {
-        return SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
+    fun dateYmd(date: Any? = null): String {
+        return SimpleDateFormat("yyyy-MM-dd", ROOT).format(date ?: Date())
+    }
+
+    fun dateTimeYmd(date: Any? = null): String {
+        return SimpleDateFormat("yyyy-MM-dd HH:mm:ss", ROOT).format(date ?: Date())
     }
 
     fun getTime(): String {
-        return SimpleDateFormat("HH:mm:ss", Locale.ROOT).format(Date())
+        return SimpleDateFormat("HH:mm:ss", ROOT).format(Date())
     }
 
     fun parseTime(text: String): String {
@@ -20,11 +25,11 @@ class DateUtils {
     }
 
     fun getTodayDate(): String {
-        return SimpleDateFormat("d MMM yyyy", Locale.ROOT).format(Date())
+        return SimpleDateFormat("d MMM yyyy", ROOT).format(Date())
     }
 
     fun getTodayDmy(): String {
-        return SimpleDateFormat("dd-MM-yyyy", Locale.ROOT).format(Date())
+        return SimpleDateFormat("dd-MM-yyyy", ROOT).format(Date())
     }
 
     fun getDmyFromCal(cal: Calendar): String {
@@ -39,5 +44,9 @@ class DateUtils {
         val month = if(cal.month + 1 > 9) "${cal.month + 1}" else "0${cal.month + 1}"
         val year = "${cal.year}"
         return "$year-$month-$day"
+    }
+
+    fun dateTimeFromCal(cal: Calendar): String {
+        return dateTimeYmd(cal.timeInMillis)
     }
 }

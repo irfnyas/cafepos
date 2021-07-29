@@ -3,35 +3,39 @@ package co.wangun.cafepos.viewmodel
 import androidx.lifecycle.ViewModel
 import co.wangun.cafepos.App.Companion.db
 import cowanguncafepos.Active_order
-import cowanguncafepos.Menu
+import cowanguncafepos.Product
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.properties.Delegates
 
 @Suppress("MemberVisibilityCanBePrivate")
 class OrderViewModel: ViewModel() {
 
     private val TAG by lazy { javaClass.simpleName }
+    val dbProduct by lazy { db.productQueries }
+    val dbPayment by lazy { db.paymentQueries }
+
     var isDirty by Delegates.notNull<Boolean>()
     var tableOrder by Delegates.notNull<Long>()
+
     lateinit var dateOrder: String
     lateinit var timeOrder: String
     lateinit var ordersTemp: MutableList<Active_order>
+
+    val allProducts by lazy { MutableStateFlow(listOf<Product>()) }
+    val allCats by lazy { getAllCategories() }
 
     fun initOrder(table: Int, date: String, time: String) {
         tableOrder = table.toLong()
         dateOrder = date
         timeOrder = time
         isDirty = false
-        ordersTemp = getAllOrders().toMutableList()
+        ordersTemp = selectAllThisInvoice().toMutableList()
     }
 
-    fun getAllOrders(): List<Active_order> {
+    fun selectAllThisInvoice(): List<Active_order> {
         return db.orderQueries
-                .selectAllTimeForTable(tableOrder, dateOrder, timeOrder)
-                .executeAsList()
-    }
-
-    fun countOrder(): Long {
-        return db.orderQueries.count().executeAsOne()
+            .selectAllByTableAndDateTime(tableOrder, dateOrder, timeOrder)
+            .executeAsList()
     }
 
     fun postOrder(order: Active_order) {
@@ -60,17 +64,39 @@ class OrderViewModel: ViewModel() {
     fun delItemTemp(order: Active_order) {
         val item = ordersTemp.find { it.name == order.name }
         ordersTemp.remove(item)
+
+        // list now dirty
+        if(!isDirty) isDirty = true
     }
 
     fun delOrder(id: Long) {
         db.orderQueries.delete(id)
     }
 
-    fun getAllMenu(): List<Menu> {
-        return MenuViewModel().getAllMenu()
-    }
-
     fun getPayment(isCashChecked: Boolean): String {
         return if(isCashChecked) "cash" else "card"
+    }
+
+    fun getAllCategories(): List<String> {
+        return mutableListOf("All Categories").apply {
+            dbProduct.selectAllCategories()
+                .executeAsList()
+                .map { "${it.category}" }
+                .forEach { this.add(it) }
+        }
+    }
+
+    fun updateProductsByCats(cat: String = "") {
+        allProducts.value =
+            if(cat == allCats[0] || cat.isBlank()) dbProduct.selectAll().executeAsList()
+            else dbProduct.selectAllByCategories(cat).executeAsList()
+    }
+
+    fun selectAllPayments(): List<String> {
+        return dbPayment.selectAll().executeAsList().map { it.name }
+    }
+
+    fun invoiced(table: Long, date: String, time: String): String {
+        return "#${table}${date}${time}"
     }
 }

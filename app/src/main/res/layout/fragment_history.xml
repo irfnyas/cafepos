@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.fragment.MenuFragment">
+    tools:context=".view.fragment.ProductFragment">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/lay_top"
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:paddingHorizontal="24dp"
+        android:paddingStart="24dp"
         app:layout_constraintEnd_toEndOf="@id/rv_histories"
         app:layout_constraintStart_toStartOf="@id/rv_histories"
         app:layout_constraintTop_toBottomOf="@id/lay_top">
@@ -102,7 +102,6 @@
         android:clipToPadding="false"
         android:paddingHorizontal="16dp"
         android:paddingVertical="8dp"
-        android:scrollbars="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/separator_vertical"
@@ -142,7 +141,7 @@
             android:textAllCaps="false"
             app:backgroundTint="@color/grey_600"
             app:cornerRadius="24dp"
-            app:icon="@drawable/ic_baseline_find_in_page_24" />
+            app:icon="@drawable/ic_baseline_search_24" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_date_range"

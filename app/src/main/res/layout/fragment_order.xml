@@ -31,11 +31,10 @@
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_orders"
+        android:id="@+id/rv_main"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="16dp"
-        android:scrollbars="horizontal"
         android:clipToPadding="false"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintStart_toStartOf="parent"
@@ -69,7 +68,32 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginTop="8dp">
+            android:layout_marginVertical="8dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total Price"
+                android:alpha="0.5"
+                android:fontFamily="sans-serif"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_total_order"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="£ 0.00"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/grey_900"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginVertical="8dp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
@@ -85,8 +109,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="end"
                 android:layout_marginTop="4dp"
-                tools:text="#1202101180845"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"/>
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                tools:text="#1202101180845"/>
         </LinearLayout>
 
         <LinearLayout
@@ -94,33 +118,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginTop="16dp">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Total Price"
-                android:alpha="0.5"
-                android:fontFamily="sans-serif"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/text_total_order"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/grey_900"
-                android:layout_marginTop="4dp"
-                android:text="£ 0.00"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="24dp">
+            android:layout_marginVertical="8dp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
@@ -130,40 +128,47 @@
                 android:fontFamily="sans-serif"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
 
-            <RadioGroup
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/lay_payment"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="4dp"
-                android:orientation="horizontal">
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="4dp">
 
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/radio_cash"
-                    android:layout_width="wrap_content"
+                <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+                    android:id="@+id/edit_payment"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:checked="true"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-                    android:text="Cash"/>
-
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/radio_card"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-                    android:text="Card"/>
-            </RadioGroup>
+                    android:ellipsize="end"
+                    android:imeOptions="actionNext"
+                    android:inputType="textImeMultiLine"
+                    android:maxLines="1"
+                    tools:text="Cash" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="24dp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_new_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="New Item"
+            android:text="New Product"
             android:layout_marginVertical="4dp"
             app:icon="@drawable/ic_baseline_add_24"
             style="@style/Theme.FilledButton"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_print_adv"
+            style="@style/Theme.FilledButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="4dp"
+            android:text="Print Advance Receipt"
+            app:icon="@drawable/ic_baseline_receipt_24" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_print"
@@ -172,7 +177,7 @@
             android:text="Print Receipt"
             style="@style/Theme.FilledButton"
             android:layout_marginVertical="4dp"
-            app:icon="@drawable/ic_baseline_print_24" />
+            app:icon="@drawable/ic_baseline_receipt_long_24" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <View

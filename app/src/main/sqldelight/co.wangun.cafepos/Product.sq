@@ -1,0 +1,38 @@
+CREATE TABLE IF NOT EXISTS product (
+    id INTEGER PRIMARY KEY NOT NULL,
+    code TEXT UNIQUE NOT NULL,
+    name TEXT UNIQUE NOT NULL,
+    desc TEXT,
+    category TEXT,
+    price REAL
+);
+
+insert:
+INSERT OR REPLACE INTO product VALUES ?;
+
+selectAll:
+SELECT * FROM product ORDER BY category, name, code;
+
+selectAllByCategories:
+SELECT * FROM product WHERE category = ? ORDER BY category, name, code;
+
+selectAllCategories:
+SELECT DISTINCT category FROM product ORDER BY category;
+
+selectUnique:
+SELECT * FROM product WHERE name = ? OR code = ?;
+
+find:
+SELECT * FROM product WHERE name LIKE ? OR name LIKE ? OR name LIKE ?;
+
+delete:
+DELETE FROM product WHERE id = ?;
+
+deleteAll:
+DELETE FROM product;
+
+count:
+SELECT COUNT (*) FROM product;
+
+lastId:
+SELECT max(id) FROM product;

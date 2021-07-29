@@ -21,3 +21,6 @@ DELETE FROM printer;
 
 count:
 SELECT COUNT (*) FROM printer;
+
+lastId:
+SELECT max(id) FROM printer;

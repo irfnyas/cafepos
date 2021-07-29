@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -9,60 +7,40 @@
     android:focusableInTouchMode="true"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Category"
-        android:textColor="@color/grey_700"
-        android:layout_marginStart="12dp"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-        android:gravity="center"/>
-
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <include
+        android:id="@+id/spinner_categories"
+        layout="@layout/item_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center">
-
-        <com.skydoves.powerspinner.PowerSpinnerView
-            android:id="@+id/spinner_categories"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            app:spinner_arrow_gravity="end"
-            app:spinner_arrow_tint="@color/black"
-            app:spinner_arrow_padding="8dp"
-            android:background="@color/white"
-            app:spinner_arrow_drawable="@drawable/ic_baseline_arrow_drop_down_24"
-            app:spinner_arrow_show="true"
-            android:textColor="@color/grey_900"
-            android:hint="Please add new category..."
-            android:padding="12dp"/>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/btn_new_category"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_baseline_add_24"
-            app:fabSize="mini"
-            android:stateListAnimator="@null"
-            app:elevation="0dp"
-            app:pressedTranslationZ="0dp"
-            app:backgroundTint="@color/white"
-            app:borderWidth="0dp"/>
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <include layout="@layout/item_line"/>
+        android:layout_marginTop="16dp"/>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/lay_name_menu"
+        android:id="@+id/lay_code"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Code">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edit_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:imeOptions="actionNext"
+            android:inputType="textImeMultiLine"
+            android:selectAllOnFocus="true"
+            tools:text="A"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/lay_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:hint="Name">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edit_name_menu"
+            android:id="@+id/edit_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="A"
@@ -73,14 +51,14 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/lay_desc_menu"
+        android:id="@+id/lay_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Description"
+        android:hint="Description (Optional)"
         android:layout_marginTop="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edit_desc_menu"
+            android:id="@+id/edit_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:selectAllOnFocus="true"
@@ -90,14 +68,14 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/lay_price_menu"
+        android:id="@+id/lay_price"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Price (£)"
+        android:hint="Price"
         android:layout_marginTop="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edit_price_menu"
+            android:id="@+id/edit_price"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"

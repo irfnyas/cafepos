@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import co.wangun.cafepos.App.Companion.db
 import co.wangun.cafepos.App.Companion.du
 import co.wangun.cafepos.App.Companion.fu
 import co.wangun.cafepos.R
@@ -79,7 +78,7 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
 
     private fun initRecycler(list: List<String>) {
         val source = Source.fromList(list)
-        val presenter = Presenter.simple(requireContext(), R.layout.item_history, 0)
+        val presenter = Presenter.simple(requireContext(), R.layout.item_table, 0)
         { view, item: String ->
             // init val
             val itemSplit = item.split("?")
@@ -88,18 +87,22 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
             val time = itemSplit[2]
 
             // init view
-            val invText = view.findViewById<AppCompatTextView>(R.id.text_invoice_history)
-            val tableText = view.findViewById<AppCompatTextView>(R.id.text_table_history)
-            val dateText = view.findViewById<AppCompatTextView>(R.id.text_date_history)
-            val timeText = view.findViewById<AppCompatTextView>(R.id.text_time_history)
-            val detailBtn = view.findViewById<FloatingActionButton>(R.id.btn_detail_history)
+            val invText = view.findViewById<AppCompatTextView>(R.id.text_1)
+            val tableText = view.findViewById<AppCompatTextView>(R.id.text_2)
+            val dateText = view.findViewById<AppCompatTextView>(R.id.text_3)
+            val timeText = view.findViewById<AppCompatTextView>(R.id.text_4)
+            val detailBtn = view.findViewById<FloatingActionButton>(R.id.btn_act)
 
             // set view
             invText.text = avm.invoiceInReceipt(item,false)
             tableText.text = "Table $num"
             dateText.text = date
             timeText.text = time
-            detailBtn.setOnClickListener { createDetailDialog(item) }
+
+            detailBtn.apply {
+                setOnClickListener { createDetailDialog(item) }
+                setImageResource(R.drawable.ic_baseline_print_24)
+            }
         }
 
         // build adapter
@@ -165,7 +168,7 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
             positiveButton(text = "Print")
             listItemsSingleChoice(items = list) { _, _, text ->
                 val printer = text.split(" - ")[1]
-                fu.print(printer, invoice, total, items)
+                fu.print(printer, invoice)
             }
             if (list.isEmpty()) {
                 message(text = getString(R.string.msg_list_empty))

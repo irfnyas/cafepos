@@ -3,25 +3,32 @@ package co.wangun.cafepos.view.fragment
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.Gravity
+import android.view.Gravity.TOP
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.viewbinding.library.fragment.viewBinding
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
+import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.core.content.ContextCompat.getColor
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import co.wangun.cafepos.App.Companion.TABLE_ORDER
+import co.wangun.cafepos.App.Companion.TABLE_PRODUCT
 import co.wangun.cafepos.App.Companion.du
 import co.wangun.cafepos.App.Companion.fu
 import co.wangun.cafepos.App.Companion.su
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.DialogOrderBinding
 import co.wangun.cafepos.databinding.FragmentOrderBinding
+import co.wangun.cafepos.databinding.ItemOrderBinding
+import co.wangun.cafepos.util.FunUtils
 import co.wangun.cafepos.util.SessionUtils.Companion.LoggedInUserNick_STR
 import co.wangun.cafepos.viewmodel.MainViewModel
 import co.wangun.cafepos.viewmodel.OrderViewModel
@@ -31,11 +38,10 @@ import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.otaliastudios.elements.Adapter
-import com.otaliastudios.elements.Presenter
-import com.otaliastudios.elements.Source
+import com.github.rubensousa.gravitysnaphelper.GravitySnapHelper
 import cowanguncafepos.Active_order
+import pl.kremblewski.android.simplerecyclerviewadapter.Adapter
+import pl.kremblewski.android.simplerecyclerviewadapter.adapter
 
 
 @SuppressLint("SetTextI18n")
@@ -44,8 +50,9 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
     private val TAG by lazy { javaClass.simpleName }
     private val avm: MainViewModel by activityViewModels()
     private val vm: OrderViewModel by viewModels()
-    private val bind: FragmentOrderBinding by viewBinding()
+    private val vb: FragmentOrderBinding by viewBinding()
     private val args: OrderFragmentArgs by navArgs()
+    private lateinit var mainAdapter: Adapter
 
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
@@ -56,21 +63,36 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
     // init
     //
     private fun initFun() {
-        initView()
+        initView(false)
         initBtn()
     }
 
     private fun initBtn() {
-        bind.apply {
+        vb.apply {
             btnBack.setOnClickListener { createSaveDialog() }
-            btnNewItem.setOnClickListener { createItemDialog() }
+            btnNewItem.setOnClickListener {
+                if(avm.countTable(TABLE_PRODUCT) != 0) createItemDialog()
+                else Toast.makeText(
+                    requireContext(),
+                    getString(R.string.msg_product_empty),
+                    Toast.LENGTH_LONG).show()
+            }
             btnPrint.setOnClickListener { createPrintDialog() }
+            btnPrintAdv.setOnClickListener {
+                Toast.makeText(
+                    requireContext(),
+                    "Printing advance receipt...",
+                    Toast.LENGTH_SHORT).show()
+            }
+
+            // view
+            btnNewItem.alpha = if(avm.countTable(TABLE_PRODUCT) != 0) 1f else 0.25f
         }
     }
 
-    private fun initView() {
+    private fun initView(submitOnly: Boolean = true) {
         setTitle()
-        setRecycler()
+        setRecycler(submitOnly)
         setPrice()
         setInvoice()
         setPayment()
@@ -79,88 +101,101 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
     // set view
     //
     private fun setTitle() {
-        bind.textTitleOrder.text =
-                "Table ${args.tableOrder} - ${du.getTodayDate()} - ${args.timeOrder}"
+        val num = if(args.tableOrder == 0) "Closed Bill" else args.tableOrder
+        vb.textTitleOrder.text = "Table $num - ${du.getTodayDate()} - ${args.timeOrder}"
     }
 
     private fun setInvoice() {
-        val tableInput = "#${args.tableOrder}" +
-                args.dateOrder.replace("-","") +
-                args.timeOrder.replace(":","")
-        bind.textInvoiceOrder.text = tableInput
+        val invoice =
+            if(vm.ordersTemp.isNotEmpty()) vm.ordersTemp[0].invoice
+            else vm.invoiced(
+                args.tableOrder.toLong(),
+                args.dateOrder.replace("-",""),
+                args.timeOrder.replace(":",""))
+        vb.textInvoiceOrder.text = invoice
     }
 
     private fun setPayment() {
-        if(vm.ordersTemp.isNotEmpty() && vm.ordersTemp[0].payment != "cash") {
-           bind.radioCard.isChecked = true
+        vb.editPayment.apply {
+            isEnabled = false
+            threshold = 99
+            setTextColor(getColor(
+                requireContext(),
+                R.color.grey_900))
+            setAdapter(ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                vm.selectAllPayments()
+            ))
+            setText("${adapter.getItem(0)}")
+            doAfterTextChanged { clearFocus() }
         }
     }
 
-    private fun setRecycler() {
+    private fun setRecycler(submitOnly: Boolean = true) {
         // init val
         val list = vm.ordersTemp
-        val source = Source.fromList(list)
-        val presenter = Presenter.simple(requireContext(), R.layout.item_order, 0)
-        { view, item: Active_order ->
-            view.apply {
-                // init view
-                val nameText = findViewById<AppCompatTextView>(R.id.text_name_order)
-                val amountText = findViewById<AppCompatTextView>(R.id.text_amount_order)
-                val priceText = findViewById<AppCompatTextView>(R.id.text_price_order)
-                val noteText = findViewById<AppCompatTextView>(R.id.text_note_order)
-                val minBtn = findViewById<FloatingActionButton>(R.id.btn_min_order)
-                val plusBtn = findViewById<FloatingActionButton>(R.id.btn_plus_order)
-                val noteBtn = findViewById<FloatingActionButton>(R.id.btn_note_order)
-
-                // init inside fun
-                fun putPriceRecycler() {
-                    val amount = amountText.text.toString().toInt()
-                    val price = item.price?.times(amount) ?: 0.0
-                    priceText.text = avm.withCurrency(price)
-                    setPrice()
-                }
-
-                // set view
-                nameText.text = item.name
-                amountText.text = "${item.amount}"
-                if (item.note.isNullOrBlank()) noteText.visibility = GONE
-                else noteText.text = item.note
-                putPriceRecycler()
-
-                // init inside btn
-                minBtn.setOnClickListener {
-                    val newAmount = "${amountText.text}".toLong() - 1
-                    if (newAmount > 0) {
-                        amountText.text = "$newAmount"
-                        putItem(item, newAmount, item.note, false)
-                        putPriceRecycler()
-                    } else createRemoveDialog(item)
-                }
-
-                plusBtn.setOnClickListener {
-                    val newAmount = amountText.text.toString().toLong() + 1
-                    val newPrice = item.price?.times(newAmount) ?: 0.0
-
-                    amountText.text = "$newAmount"
-                    priceText.text = avm.withCurrency(newPrice)
-                    putItem(item, newAmount, item.note, false)
-                    putPriceRecycler()
-                }
-
-                noteBtn.setOnClickListener {
-                    createNoteDialog(item, "${amountText.text}")
-                }
-            }
+        val items = list.mapIndexed { index, item ->
+            FunUtils.Items(index, item)
         }
 
-        // build adapter
-        Adapter.builder(viewLifecycleOwner)
-                .addSource(source)
-                .addPresenter(presenter)
-                .into(bind.rvOrders)
+        if(!submitOnly) {
+            // init adapter
+            mainAdapter = adapter {
+                register { bind: ItemOrderBinding, item: FunUtils.Items, _ ->
+                    val it = item.item as Active_order
 
-        // if list empty
-        bind.layEmpty.root.visibility = if(list.isEmpty()) VISIBLE else GONE
+                    fun putPriceRecycler() {
+                        val amount = bind.textAmountOrder.text.toString().toInt()
+                        val price = it.price?.times(amount) ?: 0.0
+                        bind.textPriceOrder.text = fu.toLocale(price)
+                        setPrice()
+                    }
+
+                    bind.textNameOrder.text = it.name
+                    bind.textAmountOrder.text = "${it.amount}"
+                    if (it.note.isNullOrBlank()) bind.textNoteOrder.visibility = GONE
+                    else bind.textNoteOrder.text = it.note
+
+                    bind.btnMinOrder.setOnClickListener { _ ->
+                        val newAmount = "${bind.textAmountOrder.text}".toLong() - 1
+                        if (newAmount > 0) {
+                            bind.textAmountOrder.text = "$newAmount"
+                            putItem(it, newAmount, it.note, false)
+                            putPriceRecycler()
+                        } else createRemoveDialog(it)
+                    }
+
+                    bind.btnPlusOrder.setOnClickListener { _ ->
+                        val newAmount = bind.textAmountOrder.text.toString().toLong() + 1
+                        val newPrice = it.price?.times(newAmount) ?: 0.0
+
+                        bind.textAmountOrder.text = "$newAmount"
+                        bind.textPriceOrder.text = fu.toLocale(newPrice, true)
+                        putItem(it, newAmount, it.note, false)
+                        putPriceRecycler()
+                    }
+
+                    bind.btnNoteOrder.setOnClickListener { _ ->
+                        createNoteDialog(it, "${bind.textAmountOrder.text}")
+                    }
+
+                    putPriceRecycler()
+                }
+            }
+
+            // set adapter
+            vb.rvMain.adapter = mainAdapter
+
+            // helper
+            GravitySnapHelper(TOP).attachToRecyclerView(vb.rvMain)
+        }
+
+        // submit
+        mainAdapter.submitList(items)
+
+        // empty layout
+        vb.layEmpty.root.visibility = if (list.isEmpty()) VISIBLE else GONE
     }
 
     // dialog
@@ -183,18 +218,21 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
             lifecycleOwner(viewLifecycleOwner)
             title(text = "Note for Item")
             cornerRadius(24f)
-            cancelable(false)
             negativeButton(text = "Back")
             positiveButton(text = "Confirm")
             input(
-                    hint = "Input the note or leave it empty...",
-                    prefill = "${item.note}", allowEmpty = true
-            ) { _, input -> putItem(item, amount.toLong(), "$input", true) }
+                hint = "Input any note or leave it empty...",
+                prefill = "${item.note}", allowEmpty = true
+            ) { _, input ->
+                putItem(item, amount.toLong(),
+                    "${input.trim()}",
+                    true)
+            }
             getInputField().apply {
                 gravity = Gravity.CENTER
                 post { selectAll() }
                 setBackgroundColor(resources.getColor(
-                        android.R.color.transparent, null
+                    android.R.color.transparent, null
                 ))
             }
         }
@@ -206,59 +244,105 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
             noAutoDismiss()
             lifecycleOwner(viewLifecycleOwner)
             title(text = "New Item")
-            cancelable(false)
             cornerRadius(24f)
             customView(
-                    view = binding.root,
-                    scrollable = true,
-                    horizontalPadding = true
+                view = binding.root,
+                scrollable = true,
+                horizontalPadding = true
             )
             binding.apply {
-                // get data
-                val allItems = vm.getAllMenu()
-                val allOrders = vm.getAllOrders()
+                // reset focus
+                root.requestFocus()
 
-                // set spinner
-                spinnerItems.setItems(allItems.map { it.name })
+                // spinner
+                spinnerCategories.apply {
+                    root.apply {
+                        hint = "Category"
+                        isHelperTextEnabled = false
+                    }
+                    edit.apply {
+                        // disabled
+                        isEnabled = false
+                        setTextColor(getColor(
+                            requireContext(),
+                            R.color.grey_900))
+
+                        // after text
+                        doAfterTextChanged { cat ->
+                            vm.updateProductsByCats("$cat")
+                        }
+
+                        // set text
+                        setText(vm.allCats[0])
+
+                        // set adapter
+                        setAdapter(ArrayAdapter(
+                            requireContext(),
+                            android.R.layout.simple_list_item_1,
+                            vm.allCats
+                        ))
+                    }
+                }
+
+                spinnerProducts.apply {
+                    root.apply {
+                        hint = "Chosen Item"
+                        isHelperTextEnabled = false
+                    }
+                    edit.apply {
+                        isEnabled = false
+                        setTextColor(getColor(
+                            requireContext(),
+                            R.color.grey_900))
+                    }
+                }
+
                 editItemOrder.doAfterTextChanged {
-                    if (it.isNullOrBlank()) {
-                        // show all items if input is blank
-                        spinnerItems.setItems(allItems.map { item -> item.name })
-                    } else {
-                        // create list filtered by input
-                        val list = allItems.filter { item -> item.name.contains(it) }
-                        spinnerItems.setItems(list.map { item -> item.name })
+                    vm.allProducts.value.filter { item ->
+                        item.name.contains("$it")
+                    }.apply {
+                        if (isNotEmpty()) spinnerProducts.edit.setText(this[0].name)
+                    }
+                }
 
-                        // set chosen item from the first row
-                        if (list.isNotEmpty()) spinnerItems.selectItemByIndex(0)
-                        else spinnerItems.apply { text = ""; hint = "No item found" }
+                // live data
+                vm.allProducts.asLiveData().observe(viewLifecycleOwner) {
+                    spinnerProducts.edit.apply {
+                        setAdapter(
+                            ArrayAdapter(
+                                requireContext(),
+                                android.R.layout.simple_list_item_1,
+                                it.map { product -> product.name }
+                            )
+                        )
                     }
                 }
 
                 // dialog btn
                 negativeButton(text = "Back") { dismiss() }
                 positiveButton(text = "Confirm") {
-                    val chosen = allItems.find { item -> item.name == spinnerItems.text }
-                    val isAdded = allOrders.find { item -> item.name == spinnerItems.text }
-                    if(chosen == null || isAdded != null) {
-                        spinnerItems.apply {
-                            setHintTextColor(
-                                    ContextCompat.getColor(requireContext(), R.color.red_900)
-                            )
-                            if(isAdded != null) {
-                                hint = "${chosen?.name} is already added"
-                                text = ""
-                            }
-                        }
+                    val chosen = vm.allProducts.value.find { item ->
+                        item.name == "${spinnerProducts.edit.text}"
+                    }
+                    val isListed = vm.ordersTemp.find { item ->
+                        item.name == "${spinnerProducts.edit.text}"
+                    }
+                    if(chosen == null || isListed != null) {
+                        spinnerProducts.root.error =
+                            if(isListed != null) getString(R.string.edit_duplicated)
+                            else getString(R.string.edit_empty)
                     } else {
-                        val order = Active_order(
-                                vm.countOrder() + 1, chosen.name, 1,
+                        putItem(
+                            Active_order(
+                                vm.ordersTemp.size.toLong(),
+                                chosen.name, 1,
                                 chosen.price ?: 0.0, "",
                                 vm.tableOrder, vm.dateOrder, vm.timeOrder,
                                 "${su.get(LoggedInUserNick_STR)}",
-                                vm.getPayment(bind.radioCash.isChecked)
+                                "${vb.editPayment.text}",
+                                "${vb.textInvoiceOrder.text}"
+                            ), 1, "", true,
                         )
-                        putItem(order, 1, "", true)
                         dismiss()
                     }
                 }
@@ -303,11 +387,8 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
     // etc
     //
     private fun printOrder(printer: String) {
-        val invoice = "${bind.textInvoiceOrder.text}"
-        val total = "${bind.textTotalOrder.text}"
-        val tableInput = "${args.tableOrder}?${args.dateOrder}?${args.timeOrder}"
-        val items = avm.getDetailOrders(tableInput)
-        fu.print(printer, invoice, total, items)
+        val invoice = "${vb.textInvoiceOrder.text}"
+        fu.print(printer, invoice)
         backToHome()
     }
 
@@ -318,21 +399,24 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
     private fun setPrice() {
         var totalPrice = 0.0
         vm.ordersTemp.forEach { totalPrice += (it.price ?: 0.0) * (it.amount ?: 1) }
-        bind.textTotalOrder.text = avm.withCurrency(totalPrice)
+        vb.textTotalOrder.text = fu.toLocale(totalPrice, true)
     }
 
     private fun postOrder(printer: String?) {
         // del old order
-        vm.getAllOrders().forEach { vm.delOrder(it.id) }
+        vm.selectAllThisInvoice().forEach { vm.delOrder(it.id) }
 
         // post new order
-        vm.ordersTemp.map {
+        val lastId = avm.idIncrement(TABLE_ORDER)
+        vm.ordersTemp.mapIndexed { index, it ->
             Active_order(
-                    it.id, it.name, it.amount, it.price,it.note,
-                    it.num, it.date, it.time, it.creator,
-                    vm.getPayment(bind.radioCash.isChecked)
+                lastId + index, it.name, it.amount, it.price,it.note,
+                it.num, it.date, it.time, it.creator,
+                "${vb.editPayment.text}", it.invoice
             )
-        }.forEach { vm.postOrder(it) }
+        }.forEach {
+            vm.postOrder(it)
+        }
 
         // print order
         if(!printer.isNullOrBlank()) printOrder(printer)
@@ -341,11 +425,11 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
 
     private fun putItem(item: Active_order, amount: Long, note: String?, refresh: Boolean) {
         vm.postItemTemp(
-                Active_order(
-                        item.id, item.name, amount, item.price, note,
-                        args.tableOrder.toLong(), args.dateOrder, args.timeOrder,
-                        "${su.get(LoggedInUserNick_STR)}", "cash"
-                )
+            Active_order(
+                item.id, item.name, amount, item.price, note,
+                args.tableOrder.toLong(), args.dateOrder, args.timeOrder,
+                "${su.get(LoggedInUserNick_STR)}", "?", item.invoice
+            )
         )
         if(refresh) initView()
     }
