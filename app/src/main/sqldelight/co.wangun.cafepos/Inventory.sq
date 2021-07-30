@@ -14,6 +14,10 @@ selectAll:
 SELECT *, category, unit FROM inventory INNER JOIN material
 ON inventory.name = material.name ORDER BY datetime DESC, category, inventory.name;
 
+selectAllToday:
+SELECT *, category, unit FROM inventory INNER JOIN material
+ON inventory.name = material.name WHERE date(inventory.datetime) = date('now') ORDER BY datetime DESC, category, inventory.name;
+
 selectAllPositive:
 SELECT *, category, unit FROM inventory INNER JOIN material ON inventory.name = material.name
 WHERE inventory.mass > 0 ORDER BY datetime DESC, category, inventory.name;

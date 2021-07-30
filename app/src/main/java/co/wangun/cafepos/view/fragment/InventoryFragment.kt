@@ -137,23 +137,40 @@ class InventoryFragment: Fragment(R.layout.fragment_inventory) {
             mainAdapter = adapter {
                 register { bind: ItemTableBinding, item: FunUtils.Items, _ ->
                     val it = item.item
-                    it as InventoryViewModel.Joined
-
-                    bind.btnAct.setOnClickListener { _ -> inventoryDialog(it) }
-                    when(vb.tab.selectedTabPosition) {
-                        1 ->  listOf(
-                            "(${it.category}) ${it.name}",
-                            "${it.mass} ${it.unit}",
-                            fu.toLocale(it.price?.times(-1)),
-                            it.datetime?.dropLast(7)
-                        )
-                        2 -> listOf(
-                            "(${it.category}) ${it.name}",
-                            "${it.mass?.times(-1)} ${it.unit}",
-                            fu.toLocale(it.price?.times(-1)),
-                            it.datetime?.dropLast(7)
-                        )
-                        else -> listOf("?","?","?","?")
+                    bind.btnAct.setOnClickListener { _ ->
+                        when (it) {
+                            is InventoryViewModel.Joined -> inventoryDialog(it)
+                            is InventoryViewModel.Summary -> summaryDialog(it)
+                        }
+                    }
+                    when (vb.tab.selectedTabPosition) {
+                        1 -> {
+                            it as InventoryViewModel.Joined
+                            listOf(
+                                "(${it.category}) ${it.name}",
+                                "${it.mass} ${it.unit}",
+                                fu.toLocale(it.price?.times(-1)),
+                                it.datetime?.dropLast(7)
+                            )
+                        }
+                        2 -> {
+                            it as InventoryViewModel.Joined
+                            listOf(
+                                "(${it.category}) ${it.name}",
+                                "${it.mass?.times(-1)} ${it.unit}",
+                                fu.toLocale(it.price?.times(-1)),
+                                it.datetime?.dropLast(7)
+                            )
+                        }
+                        else -> {
+                            it as InventoryViewModel.Summary
+                            listOf(
+                                "(${it.category}) ${it.name}",
+                                "${it.acquiredMass} ${it.unit}",
+                                "${it.usedMass} ${it.unit}",
+                                "${it.actualMass} ${it.unit}",
+                            )
+                        }
                     }.let { str ->
                         bind.run { listOf(text1, text2, text3, text4) }
                             .forEachIndexed { index, v -> v.text = str[index] }
@@ -173,6 +190,12 @@ class InventoryFragment: Fragment(R.layout.fragment_inventory) {
 
         // empty layout
         vb.layEmpty.root.visibility = if (list.isEmpty()) VISIBLE else GONE
+    }
+
+    // dialog
+    //
+    private fun summaryDialog(it: InventoryViewModel.Summary) {
+        Toast.makeText(requireContext(), "Detail of ${it.name} summary", Toast.LENGTH_SHORT).show()
     }
 
     private fun inventoryDialog(item: InventoryViewModel.Joined? = null) {

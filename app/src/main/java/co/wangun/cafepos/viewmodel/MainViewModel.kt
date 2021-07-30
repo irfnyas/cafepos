@@ -243,6 +243,6 @@ class MainViewModel: ViewModel() {
     }
 
     fun getParentRecipes(parent: String): MutableList<Recipe> {
-        return dbRecipe.findAllParentRecipes(parent).executeAsList().toMutableList()
+        return dbRecipe.selectAllParentRecipes(parent).executeAsList().toMutableList()
     }
 }
