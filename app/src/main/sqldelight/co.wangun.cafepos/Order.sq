@@ -24,14 +24,21 @@ SELECT * FROM active_order WHERE invoice = ?;
 selectAllByTableAndDateTime:
 SELECT * FROM active_order WHERE num = ? AND date = ? AND time = ?;
 
-selectAllToday:
+selectAllNameAmountSumToday:
 SELECT name, sum(amount) FROM active_order WHERE date = date('now') GROUP BY name;
+
+selectAllNameAmountSum:
+SELECT name, sum(amount) FROM active_order GROUP BY name;
 
 selectAllTodayForTable:
 SELECT * FROM active_order WHERE num = ? AND date = ? GROUP BY invoice ORDER BY time DESC;
 
 selectDistinct:
 SELECT DISTINCT invoice FROM active_order ORDER BY date DESC, time DESC;
+
+selectAllByDateRange:
+SELECT * FROM active_order WHERE date BETWEEN ? AND ?
+GROUP BY invoice ORDER BY date DESC, time DESC;
 
 selectDistinctByDateRange:
 SELECT DISTINCT invoice FROM active_order

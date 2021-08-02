@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.fragment.PaymentFragment">
+    tools:context=".view.fragment.FinanceFragment">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/lay_top"
@@ -28,7 +28,30 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="Order History" />
+            android:text="Financial" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:tabIndicatorColor="@android:color/transparent"
+            app:tabMode="auto">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sold Today" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Product Cost" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Refined Cost" />
+        </com.google.android.material.tabs.TabLayout>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <include
@@ -48,10 +71,21 @@
         android:clipToPadding="false"
         android:padding="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/rv_footer"
         app:layout_constraintEnd_toEndOf="@id/separator_vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/rv_header" />
+
+    <include
+        android:id="@+id/rv_footer"
+        layout="@layout/item_table_header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/rv_main"
+        app:layout_constraintStart_toStartOf="@id/rv_main" />
 
     <include
         android:id="@+id/lay_empty"
@@ -80,17 +114,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="4dp"
-            android:text="All Transactions"
+            android:text="All Materials"
             app:icon="@drawable/ic_baseline_search_24" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_date"
+            android:id="@+id/btn_cats"
             style="@style/Theme.FilledButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="4dp"
-            android:text="Today"
-            app:icon="@drawable/ic_baseline_date_range_24" />
+            android:text="All Categories"
+            app:icon="@drawable/ic_baseline_category_24" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <View

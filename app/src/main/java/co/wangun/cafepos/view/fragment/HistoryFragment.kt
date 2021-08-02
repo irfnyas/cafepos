@@ -2,23 +2,23 @@ package co.wangun.cafepos.view.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.text.InputType
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.viewbinding.library.fragment.viewBinding
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
 import co.wangun.cafepos.App.Companion.du
 import co.wangun.cafepos.App.Companion.fu
 import co.wangun.cafepos.R
 import co.wangun.cafepos.databinding.DialogReceiptBinding
 import co.wangun.cafepos.databinding.FragmentHistoryBinding
+import co.wangun.cafepos.databinding.ItemReceiptBinding
+import co.wangun.cafepos.databinding.ItemTableBinding
+import co.wangun.cafepos.util.FunUtils
 import co.wangun.cafepos.viewmodel.HistoryViewModel
 import co.wangun.cafepos.viewmodel.MainViewModel
 import com.afollestad.materialdialogs.MaterialDialog
@@ -28,10 +28,8 @@ import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.otaliastudios.elements.Adapter
-import com.otaliastudios.elements.Presenter
-import com.otaliastudios.elements.Source
+import com.github.rubensousa.gravitysnaphelper.GravitySnapHelper
+import pl.kremblewski.android.simplerecyclerviewadapter.adapter
 import java.util.*
 
 @SuppressLint("SetTextI18n")
@@ -40,7 +38,7 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
     private val TAG: String by lazy { javaClass.simpleName }
     private val avm: MainViewModel by activityViewModels()
     private val vm: HistoryViewModel by viewModels()
-    private val bind: FragmentHistoryBinding by viewBinding()
+    private val vb: FragmentHistoryBinding by viewBinding()
 
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
@@ -55,111 +53,130 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
     }
 
     private fun initBtn() {
-        bind.apply {
+        vb.apply {
             btnBack.setOnClickListener { findNavController().popBackStack() }
-            btnDateRange.setOnClickListener { createStartDateDialog() }
-            btnInvoice.setOnClickListener { createInvoiceDialog() }
+            btnDate.setOnClickListener { startDateDialog() }
+            btnFind.setOnClickListener { findFilterDialog() }
         }
     }
 
     private fun initView() {
-        initRecycler(vm.getTodayOrders())
-        initDateRange()
-        initInvoice()
-    }
+        initHeader()
+        initRecycler()
 
-    private fun initDateRange() {
-        bind.btnDateRange.text = vm.getDefaultDateRange()
-    }
+        vm.keywordFilter.asLiveData().observe(viewLifecycleOwner) {
+            vb.btnFind.text =
+                if (it.isNotBlank()) "\"$it\""
+                else "All Transactions"
+        }
+        vm.dateFilter.asLiveData().observe(viewLifecycleOwner) {
+            val split = it.split("_")
+            val start = split[0]
+            val end = split[1]
 
-    private fun initInvoice() {
-        bind.btnInvoice.text = "All Transactions"
-    }
-
-    private fun initRecycler(list: List<String>) {
-        val source = Source.fromList(list)
-        val presenter = Presenter.simple(requireContext(), R.layout.item_table, 0)
-        { view, item: String ->
-            // init val
-            val itemSplit = item.split("?")
-            val num = itemSplit[0]
-            val date = itemSplit[1]
-            val time = itemSplit[2]
-
-            // init view
-            val invText = view.findViewById<AppCompatTextView>(R.id.text_1)
-            val tableText = view.findViewById<AppCompatTextView>(R.id.text_2)
-            val dateText = view.findViewById<AppCompatTextView>(R.id.text_3)
-            val timeText = view.findViewById<AppCompatTextView>(R.id.text_4)
-            val detailBtn = view.findViewById<FloatingActionButton>(R.id.btn_act)
-
-            // set view
-            invText.text = avm.invoiceInReceipt(item,false)
-            tableText.text = "Table $num"
-            dateText.text = date
-            timeText.text = time
-
-            detailBtn.apply {
-                setOnClickListener { createDetailDialog(item) }
-                setImageResource(R.drawable.ic_baseline_print_24)
+            vb.btnDate.text = when {
+                it == vm.getTodayDateRange() -> "Today"
+                start == end -> "\"$start\""
+                else -> "\"${it.replace("_", " - ")}\""
             }
         }
+    }
 
-        // build adapter
-        Adapter.builder(viewLifecycleOwner)
-                .addSource(source)
-                .addPresenter(presenter)
-                .into(bind.rvHistories)
+    private fun initHeader() {
+        listOf("Invoice", "Table", "Date", "Payment").let { str ->
+            vb.rvHeader
+                .run { listOf(text1, text2, text3, text4) }
+                .forEachIndexed { index, v -> v.text = str[index] }
+        }
+    }
 
-        // if list empty
-        bind.layEmpty.root.visibility = if(list.isEmpty()) VISIBLE else GONE
+    private fun initRecycler() {
+        val list = vm.selectAll()
+        val items = list.mapIndexed { index, item ->
+            FunUtils.Items(index, item)
+        }
+
+        vb.rvMain.apply {
+            adapter = adapter {
+                register { bind: ItemTableBinding, item: FunUtils.Items, _ ->
+                    val it = item.item as HistoryViewModel.Transaction
+
+                    bind.btnAct.apply {
+                        setOnClickListener { _ -> detailDialog(it) }
+                        setImageResource(R.drawable.ic_baseline_receipt_long_24)
+                    }
+                    listOf(
+                        it.invoice,
+                        "Table ${it.table}",
+                        it.dateTime,
+                        it.payment
+                    ).let { str ->
+                        bind.run { listOf(text1, text2, text3, text4) }
+                            .forEachIndexed { index, v -> v.text = str[index] }
+                    }
+                }
+            }.apply { submitList(items) }
+
+            // helper
+            GravitySnapHelper(Gravity.TOP).attachToRecyclerView(this)
+            vb.layEmpty.root.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
+        }
     }
 
     // dialog
     //
-    private fun createDetailDialog(tableInput: String) {
-        val binding = DialogReceiptBinding.inflate(LayoutInflater.from(requireContext()))
+    private fun detailDialog(item: HistoryViewModel.Transaction) {
+        val bind = DialogReceiptBinding.inflate(LayoutInflater.from(requireContext()))
+
+        val list = item.products.map {
+            avm.itemInReceipt(it.first, it.second, it.third)
+        }
+
+        fun initRvItemsReceipt() {
+            val items = list.mapIndexed { index, item ->
+                FunUtils.Items(index, item)
+            }
+
+            bind.rvItemsReceipt.apply {
+                adapter = adapter {
+                    register { bind: ItemReceiptBinding, item: FunUtils.Items, _ ->
+                        bind.root.text = item.item as String
+                    }
+                }.apply { submitList(items) }
+
+                // helper
+                GravitySnapHelper(Gravity.TOP).attachToRecyclerView(this)
+            }
+        }
+
         MaterialDialog(requireContext()).show {
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
-            customView(view = binding.root,
-                    scrollable = true,
-                    dialogWrapContent = true
+            customView(
+                view = bind.root,
+                scrollable = true,
+                dialogWrapContent = true
             )
-            binding.apply {
+            bind.apply {
                 // set text
-                textInvoiceReceipt.text = avm.invoiceInReceipt(tableInput, true)
-                textTableReceipt.text = avm.tableInReceipt(tableInput)
-                textTotalReceipt.text = avm.totalInReceipt(tableInput)
+                textInvoiceReceipt.text = avm.invoiceInReceipt(item.invoice)
+                textTableReceipt.text = avm.headerInReceipt(item.table, item.dateTime)
+                textTotalReceipt.text = avm.totalInReceipt(vm.productsPriceSum(item))
 
                 // set recycler
-                val list = avm.getDetailOrders(tableInput)
-                val source = Source.fromList(list)
-                val presenter = Presenter.simple(
-                        requireContext(), R.layout.item_receipt, 0
-                ) { view, item: String -> (view as AppCompatTextView).text = item }
-                Adapter.builder(viewLifecycleOwner)
-                        .addSource(source)
-                        .addPresenter(presenter)
-                        .into(rvItemsReceipt)
+                initRvItemsReceipt()
 
                 // set dialog btn
                 negativeButton(text = "Back")
                 positiveButton(text = "Print") {
-                    createPrintDialog(
-                            "${textInvoiceReceipt.text}",
-                            "${textTotalReceipt.text}",
-                            list
-                    )
+                    createPrintDialog(item)
                 }
             }
         }
     }
 
-    private fun createPrintDialog(invoice: String, total: String, items: List<String>) {
-        val printers = avm.getPrinters()
-        val list = printers.map { "${it.name} - ${it.address}" }
-
+    private fun createPrintDialog(item: HistoryViewModel.Transaction) {
+        val list = avm.getPrinters().map { "${it.name} - ${it.address}" }
         MaterialDialog(requireContext()).show {
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
@@ -168,130 +185,92 @@ class HistoryFragment: Fragment(R.layout.fragment_history) {
             positiveButton(text = "Print")
             listItemsSingleChoice(items = list) { _, _, text ->
                 val printer = text.split(" - ")[1]
-                fu.print(printer, invoice)
+                fu.print(printer, item.invoice)
             }
-            if (list.isEmpty()) {
-                message(text = getString(R.string.msg_list_empty))
+            if (list.isEmpty()) message(text = getString(R.string.msg_list_empty))
+        }
+    }
+
+    private fun findFilterDialog() {
+        val isAlreadyFiltered = vm.keywordFilter.value.isNotBlank()
+        val preFill = if (isAlreadyFiltered) vm.keywordFilter.value else ""
+
+        fun setFilter(input: String) {
+            vm.setKeywordFilter(input)
+            initRecycler()
+        }
+
+        MaterialDialog(requireContext()).show {
+            lifecycleOwner(viewLifecycleOwner)
+            title(text = "Keyword Filter")
+            cornerRadius(24f)
+
+            negativeButton(text = "Back")
+            positiveButton(text = "Confirm")
+            if (isAlreadyFiltered) neutralButton(text = "Remove") { setFilter("") }
+
+            input(
+                hint = "Input the keyword you are looking for...",
+                prefill = preFill
+            ) { _, input -> setFilter("$input") }
+            getInputField().apply {
+                gravity = Gravity.CENTER
+                post { selectAll() }
+                setBackgroundColor(
+                    resources.getColor(
+                        android.R.color.transparent, null
+                    )
+                )
             }
         }
     }
 
-    private fun createStartDateDialog() {
+    private fun startDateDialog(startCal: Calendar? = Calendar.getInstance()) {
         MaterialDialog(requireContext()).show {
-            noAutoDismiss()
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
             title(text = "Date Filter")
             message(text = "Select start date")
-            datePicker(maxDate = Calendar.getInstance()) { _, date ->
-                val dateDmy = du.getDmyFromCal(date)
-                val nowDmy = du.getDmyFromCal(Calendar.getInstance())
-                if (dateDmy != nowDmy) createEndDateDialog(this, date)
-                else {
-                    filterToday()
-                    dismiss()
-                }
+            datePicker(
+                currentDate = startCal,
+                maxDate = Calendar.getInstance(),
+            ) { _, date ->
+                val dateDmy = du.getYmdFromCal(date)
+                val nowDmy = du.dateYmd()
+                if (dateDmy != nowDmy) endDateDialog(date)
+                else vm.setDateFilter()
             }
             positiveButton(text = "Confirm")
             negativeButton(text = "Back") { dismiss() }
 
             // show filter today if not filtered by today
-            if(bind.btnDateRange.text.contains("-"))
-            neutralButton(text = "Select Today") { filterToday(); dismiss() }
+            if (vb.btnDate.text.contains("-")) {
+                neutralButton(text = "Set Today") {
+                    vm.setDateFilter()
+                    initRecycler()
+                    dismiss()
+                }
+            }
         }
     }
 
-    private fun createEndDateDialog(startDialog: MaterialDialog, startDate: Calendar) {
+    private fun endDateDialog(startDate: Calendar) {
         MaterialDialog(requireContext()).show {
             lifecycleOwner(viewLifecycleOwner)
             cornerRadius(24f)
             title(text = "Date Filter")
             message(text = "Start from ${du.getDmyFromCal(startDate)} until...")
             datePicker(maxDate = Calendar.getInstance(), minDate = startDate) { _, date ->
-                startDialog.dismiss()
-                filterDate(startDate, date)
+                vm.setDateFilter(
+                    du.getYmdFromCal(startDate),
+                    du.getYmdFromCal(date)
+                )
+                initRecycler()
             }
-            negativeButton(text = "Back")
+            negativeButton(text = "Back") {
+                startDateDialog(startDate)
+            }
             positiveButton(text = "Confirm")
         }
-    }
-
-    private fun createInvoiceDialog() {
-        // init val
-        val isAlreadyFiltered = bind.btnInvoice.text.contains("#")
-        val preFill = if(isAlreadyFiltered) bind.btnInvoice.text.drop(1) else ""
-
-        // build dialog
-        MaterialDialog(requireContext()).show {
-            lifecycleOwner(viewLifecycleOwner)
-            title(text = "Customer Number Filter")
-            cornerRadius(24f)
-            cancelable(false)
-
-            // input
-            input(
-                    hint = "Input the invoice without #...",
-                    inputType = InputType.TYPE_CLASS_NUMBER,
-                    prefill = preFill
-            ) { _, input -> filterByInvoice("$input") }
-
-            // input field style
-            getInputField().apply {
-                gravity = Gravity.CENTER
-                post { selectAll() }
-                setBackgroundColor(resources.getColor(
-                        android.R.color.transparent, null
-                ))
-            }
-
-            // neutral btn
-            negativeButton(text = "Back")
-            positiveButton(text = "Confirm")
-            if(isAlreadyFiltered) {
-                neutralButton(text = "Remove") {
-                    filterByInvoice("")
-                }
-            }
-        }
-    }
-
-    // etc
-    //
-    private fun filterToday() {
-        // update list
-        val start = du.getYmdFromCal(Calendar.getInstance())
-        initRecycler(vm.getRangedOrders(start, start))
-
-        // update btn text
-        bind.btnDateRange.text = "Today"
-
-        // remove filter invoice
-        initInvoice()
-    }
-
-    private fun filterDate(startCal: Calendar, endCal: Calendar) {
-        //update list
-        val start = du.getYmdFromCal(startCal)
-        val end = du.getYmdFromCal(endCal)
-        initRecycler(vm.getRangedOrders(start, end))
-
-        // update btn tex
-        val startStr = du.getDmyFromCal(startCal)
-        var endStr = du.getDmyFromCal(endCal)
-        val now = du.getDmyFromCal(Calendar.getInstance())
-        if(endStr == now) endStr = "Today"
-        val btnText = if (startStr == endStr) startStr else "$startStr until $endStr"
-        bind.btnDateRange.text = btnText
-
-        // remove filter invoice
-        initInvoice()
-    }
-
-    private fun filterByInvoice(input: String) {
-        if(input.isNotBlank()) {
-            initRecycler(vm.getOrderByInvoice(input))
-            bind.btnInvoice.text = "#$input"
-            bind.btnDateRange.text = "Not filtered by date"
-        } else initView()
     }
 }

@@ -70,6 +70,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
             btnEditPayment.setOnClickListener { navToPaymentFragment() }
             btnEditInventory.setOnClickListener { navToInventoryFragment() }
             btnEditMaterial.setOnClickListener { navToMaterialFragment() }
+            btnFinancial.setOnClickListener { navToFinanceFragment() }
             btnOrderHistory.setOnClickListener { navToHistoryFragment() }
         }
     }
@@ -91,7 +92,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                 register { bind: ItemNumberBinding, item: FunUtils.Items, _ ->
                     val it = item.item as Int
                     bind.root.apply {
-                        text = if(it == 0) "Closed Bill Order" else "$it"
+                        text = if (it == 0) "Non-Table Order" else "$it"
                         setOnClickListener { _ -> createOrderDialog(it) }
                     }
                 }
@@ -245,8 +246,8 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
             ) { _, input ->
                 val int = input.toString().toInt()
 //                if(int > 0) {
-                    putTablesAmount(int)
-                    dismiss()
+                putTablesAmount(int)
+                dismiss()
 //                } else getInputLayout().error = getString(R.string.edit_invalid)
             }
             getInputField().apply {
@@ -262,7 +263,9 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     private fun createOrderDialog(num: Int) {
         // init val
         val list = vm.getTodayOrderForTable(num)
-        val title = if(num == 0) "Table Closed Bill" else "Table $num (${du.getTodayDate()})"
+        val title =
+            if (num == 0) "Non-Table Order / Table 0 (${du.getTodayDate()})"
+            else "Table $num (${du.getTodayDate()})"
 
         // create dialog
         MaterialDialog(requireContext()).show {
@@ -382,6 +385,11 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
     private fun navToMaterialFragment() {
         val action = HomeFragmentDirections.actionHomeFragmentToMaterialFragment()
+        findNavController().navigate(action)
+    }
+
+    private fun navToFinanceFragment() {
+        val action = HomeFragmentDirections.actionHomeFragmentToFinanceFragment()
         findNavController().navigate(action)
     }
 

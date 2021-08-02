@@ -101,8 +101,8 @@ class OrderFragment: Fragment(R.layout.fragment_order) {
     // set view
     //
     private fun setTitle() {
-        val num = if(args.tableOrder == 0) "Closed Bill" else args.tableOrder
-        vb.textTitleOrder.text = "Table $num - ${du.getTodayDate()} - ${args.timeOrder}"
+        val num = if (args.tableOrder == 0) "Non-Table Order" else "Table ${args.tableOrder}"
+        vb.textTitleOrder.text = "$num - ${du.getTodayDate()} - ${args.timeOrder}"
     }
 
     private fun setInvoice() {

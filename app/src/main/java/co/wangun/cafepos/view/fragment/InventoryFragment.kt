@@ -43,6 +43,7 @@ import com.wajahatkarim3.easyvalidation.core.view_ktx.nonEmpty
 import cowanguncafepos.Inventory
 import pl.kremblewski.android.simplerecyclerviewadapter.Adapter
 import pl.kremblewski.android.simplerecyclerviewadapter.adapter
+import kotlin.math.absoluteValue
 
 @SuppressLint("SetTextI18n")
 class InventoryFragment: Fragment(R.layout.fragment_inventory) {
@@ -80,7 +81,7 @@ class InventoryFragment: Fragment(R.layout.fragment_inventory) {
     }
 
     private fun initView(i: Int) {
-        initHeaderList(i)
+        initHeader(i)
         initRecycler(false)
 
         vm.keywordFilter.asLiveData().observe(viewLifecycleOwner) {
@@ -98,9 +99,9 @@ class InventoryFragment: Fragment(R.layout.fragment_inventory) {
         }
     }
 
-    private fun initHeaderList(i: Int) {
-        when(i) {
-            0 -> listOf("Material", "Acquired", "Reduced", "Actual")
+    private fun initHeader(i: Int) {
+        when (i) {
+            0 -> listOf("Material", "Acquired", "Used", "Actual")
             1 -> listOf("Material", "Acquired", "Price (outcome)", "Date")
             2 -> listOf("Material", "Reduced", "Price (outcome)", "Date")
             else -> listOf("?", "?", "?", "?")
@@ -167,7 +168,7 @@ class InventoryFragment: Fragment(R.layout.fragment_inventory) {
                             listOf(
                                 "(${it.category}) ${it.name}",
                                 "${it.acquiredMass} ${it.unit}",
-                                "${it.usedMass} ${it.unit}",
+                                "${it.usedTotalMass} ${it.unit}",
                                 "${it.actualMass} ${it.unit}",
                             )
                         }
@@ -283,12 +284,13 @@ class InventoryFragment: Fragment(R.layout.fragment_inventory) {
                 // edit text
                 layDesc.editText?.setText(item?.desc)
                 layDate.editText?.setText(item?.datetime)
-                layMass.editText?.setText("${item?.mass ?: 0.0}")
-                layPrice.editText?.setText("${item?.price ?: 0.0}")
+                layUnit.editText?.setText(item?.unit)
+                layMass.editText?.setText("${item?.mass?.absoluteValue ?: 0.0}")
+                layPrice.editText?.setText("${item?.price?.absoluteValue ?: 0.0}")
 
                 // switch
                 switchPrice.setOnCheckedChangeListener { view, isChecked ->
-                    view.text = if(isChecked) "As Income" else "As Outcome"
+                    view.text = if (isChecked) "As Income" else "As Outcome"
                 }
 
                 // date
@@ -309,14 +311,14 @@ class InventoryFragment: Fragment(R.layout.fragment_inventory) {
 
                 // spinner
                 layName.apply {
-                    root.hint = "Material"
+                    root.hint = "Raw Material"
                     root.isHelperTextEnabled = false
                     edit.setText(item?.name)
                     edit.setAdapter(
                         ArrayAdapter(
                             requireContext(),
                             android.R.layout.simple_list_item_1,
-                            vm.materials.map { it.name }
+                            vm.getAllMaterials(0).map { it.name }
                         )
                     )
                     edit.doAfterTextChanged {

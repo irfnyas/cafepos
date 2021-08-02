@@ -16,5 +16,5 @@
     <string name="msg_save_warning">It is not recommended to save this order without printing the receipt.</string>
     <string name="msg_material_empty">You have no material, please add a new one first from the \'Edit Material\' sections.</string>
     <string name="msg_product_empty">You have no product, please add a new one first from the \'Edit Product\' sections.</string>
-    <string name="msg_categories">The products that are within this selected categories will be displayed</string>
+    <string name="msg_categories">Items that are within this selected categories will be displayed</string>
 </resources>

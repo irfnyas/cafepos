@@ -79,7 +79,7 @@ class MaterialFragment: Fragment(R.layout.fragment_material) {
     }
 
     private fun initView(i: Int) {
-        initHeaderList(i)
+        initHeader(i)
         initRecycler(false)
 
         vm.keywordFilter.asLiveData().observe(viewLifecycleOwner) {
@@ -97,9 +97,9 @@ class MaterialFragment: Fragment(R.layout.fragment_material) {
         }
     }
 
-    private fun initHeaderList(i: Int) {
+    private fun initHeader(i: Int) {
         listOf("Material", "Category", "Mass Unit", "Mass Value").let { str ->
-            vb.rvHeader.apply { text4.visibility = if(i == 2) GONE else VISIBLE }
+            vb.rvHeader.apply { text4.visibility = if (i == 2) GONE else VISIBLE }
                 .run { listOf(text1, text2, text3, text4) }
                 .forEachIndexed { index, v -> v.text = str[index] }
         }

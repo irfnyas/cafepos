@@ -31,6 +31,9 @@
         <action
             android:id="@+id/action_homeFragment_to_materialFragment"
             app:destination="@id/materialFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_financeFragment"
+            app:destination="@id/financeFragment" />
     </fragment>
     <fragment
         android:id="@+id/orderFragment"
@@ -81,4 +84,9 @@
         android:name="co.wangun.cafepos.view.fragment.MaterialFragment"
         android:label="fragment_material"
         tools:layout="@layout/fragment_material" />
+    <fragment
+        android:id="@+id/financeFragment"
+        android:name="co.wangun.cafepos.view.fragment.FinanceFragment"
+        android:label="fragment_finance"
+        tools:layout="@layout/fragment_finance" />
 </navigation>

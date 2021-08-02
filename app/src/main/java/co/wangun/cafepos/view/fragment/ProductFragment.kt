@@ -154,7 +154,6 @@ class ProductFragment: Fragment(R.layout.fragment_product) {
 
     // dialog
     //
-
     private fun optionsDialog(product: Product) {
         val items = listOf("Product Detail", "Product Recipes")
         MaterialDialog(requireContext()).show {
@@ -233,22 +232,25 @@ class ProductFragment: Fragment(R.layout.fragment_product) {
                             "${editDesc.text?.trim()}",
                             "${spinnerCategories.edit.text?.trim()}",
                             "${editPrice.text}".toDouble())
-                        ), initRecycler(), bind.root)
+                        ), initRecycler(), bind.root
+                        )
                         dismiss()
                     }
                 }
 
                 bind.root.requestFocus()
                 layCode.apply {
-                    isEnabled = isNew
                     editText?.setText(product?.code)
                     helperText = getString(R.string.edit_once)
+                    isEnabled = isNew
+                    isHelperTextEnabled = isNew
                 }
 
                 layName.apply {
-                    isEnabled = isNew
                     editText?.setText(product?.name)
                     helperText = getString(R.string.edit_once)
+                    isEnabled = isNew
+                    isHelperTextEnabled = isNew
                 }
 
                 editDesc.setText(product?.desc)
@@ -307,7 +309,7 @@ class ProductFragment: Fragment(R.layout.fragment_product) {
 
         val titleDialog =
             if (isNew) "New Recipe for ${parent.name}"
-            else "Edit ${item?.name} for ${parent.name}"
+            else "Edit ${item?.name} recipe for ${parent.name}"
 
         val bind = DialogRecipeBinding.inflate(LayoutInflater.from(requireContext()))
 
@@ -412,7 +414,7 @@ class ProductFragment: Fragment(R.layout.fragment_product) {
                                 materials.map {
                                     it as Material
                                     "${it.unit}"
-                                }
+                                }.distinct()
                             )
                         )
                     }

@@ -15,7 +15,7 @@ class InventoryViewModel: ViewModel() {
     val dbInventory by lazy { db.inventoryQueries }
     val keywordFilter by lazy { MutableStateFlow("") }
     val catsFilter by lazy { MutableStateFlow(mutableListOf<String>()) }
-    val materials by lazy { getAllMaterials() }
+    val materials by lazy { getAllMaterials(null) }
 
     data class Joined(
         var id: Long,
@@ -32,11 +32,14 @@ class InventoryViewModel: ViewModel() {
         var name: String,
         var category: String,
         var unit: String,
+        var isRaw: Boolean,
         var acquiredMass: Double,
         var acquiredPrice: Double,
         var reducedMass: Double,
         var reducedPrice: Double,
-        var usedMass: Double,
+        var usedByProductMass: Double,
+        var usedByRefinedMass: Double,
+        var usedTotalMass: Double,
         var actualMass: Double,
         var actualPrice: Double
     )
@@ -49,15 +52,25 @@ class InventoryViewModel: ViewModel() {
         catsFilter.value = input.map { "$it" }.toMutableList()
     }
 
-    fun selectAll(list: List<Joined>): List<Joined> {
+    fun selectAll(list: List<Any>): List<Any> {
         return list.toMutableList().apply {
-            if(keywordFilter.value.isNotBlank()) retainAll {
-                val hasName = it.name.contains(keywordFilter.value, true)
-                val hasDesc = it.desc?.contains(keywordFilter.value, true) == true
-                hasName || hasDesc
+            if (keywordFilter.value.isNotBlank()) retainAll {
+                when (it) {
+                    is Joined -> {
+                        val hasName = it.name.contains(keywordFilter.value, true)
+                        val hasDesc = it.desc?.contains(keywordFilter.value, true) == true
+                        hasName || hasDesc
+                    }
+                    is Summary -> it.name.contains(keywordFilter.value, true)
+                    else -> false
+                }
             }
             if (catsFilter.value.isNotEmpty()) retainAll {
-                catsFilter.value.contains(it.category)
+                when (it) {
+                    is Joined -> catsFilter.value.contains(it.category)
+                    is Summary -> catsFilter.value.contains(it.category)
+                    else -> false
+                }
             }
         }
     }
@@ -65,10 +78,11 @@ class InventoryViewModel: ViewModel() {
     fun getSummaries(): List<Summary> {
         val list = mutableListOf<Summary>()
 
-        getAllMaterials().forEach { mat ->
+        materials.forEach { mat ->
             val name = mat.name
             val category = mat.category ?: "?"
             val unit = mat.unit ?: "?"
+            val isRaw = mat.is_raw == 1L
             var acquireMass = 0.0
             var acquirePrice = 0.0
             var reduceMass = 0.0
@@ -95,34 +109,60 @@ class InventoryViewModel: ViewModel() {
 
             list.add(
                 Summary(
-                    name, category, unit,
+                    name, category, unit, isRaw,
                     acquireMass, acquirePrice,
                     reduceMass, reducePrice,
-                    0.0, 0.0, 0.0
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
                 )
             )
         }
 
         // check used
-        getAllTodayOrders().forEach { pair ->
+        getAllAmountOrders().forEach { pair ->
             getAllRecipesByParent(pair.first).forEach { rec ->
                 list.find { it.name == rec.name }?.let {
-                    it.usedMass += rec.mass?.times(pair.second) ?: 0.0
+                    it.usedByProductMass += rec.mass?.times(pair.second) ?: 0.0
                 }
             }
         }
 
+        // convert refined to raw
+        list.forEach { sum ->
+            if (!sum.isRaw) {
+                getAllRecipesByParent(sum.name).forEach { rec ->
+                    list.find { it.name == rec.name }?.let {
+                        val refinedMass =
+                            materials.find { mat -> mat.name == sum.name }?.mass ?: 0.0
+                        val rawMassNeeded = rec.mass ?: 1.0
+                        val usedByRefined = rawMassNeeded / refinedMass * sum.usedByProductMass
+                        it.usedByRefinedMass += usedByRefined
+                    }
+                }
+            }
+        }
+
+        // calculate actual
         list.forEach {
-            it.actualMass = it.acquiredMass + it.reducedMass - it.usedMass
+            it.usedTotalMass = it.usedByProductMass + it.usedByRefinedMass
+            it.actualMass = it.acquiredMass + it.reducedMass - it.usedTotalMass
             it.actualPrice = it.acquiredPrice + it.reducedPrice
         }
 
+        // show raw only
+        list.retainAll { it.isRaw }
+
+        // return
         return list
     }
 
     fun getAllItems(i: Int?): List<Any> {
         return selectAll(
             when (i) {
+                0 -> getSummaries()
                 1 -> dbInventory.selectAllPositive().executeAsList().map {
                     Joined(
                         it.id, it.name, it.desc, it.mass,
@@ -145,12 +185,16 @@ class InventoryViewModel: ViewModel() {
         )
     }
 
-    fun getAllMaterials(): List<Material> {
-        return dbMaterial.selectAll().executeAsList()
+    fun getAllMaterials(i: Int?): List<Material> {
+        return when (i) {
+            0 -> dbMaterial.selectAllRawMaterials()
+            1 -> dbMaterial.selectAllRefinedMaterials()
+            else -> dbMaterial.selectAll()
+        }.executeAsList()
     }
 
-    fun getAllTodayOrders(): List<Pair<String, Double>> {
-        return db.orderQueries.selectAllToday().executeAsList().map {
+    fun getAllAmountOrders(): List<Pair<String, Double>> {
+        return db.orderQueries.selectAllNameAmountSum().executeAsList().map {
             Pair("${it.name}", it.sum ?: 0.0)
         }
     }
